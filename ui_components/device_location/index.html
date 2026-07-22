@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Device Location Component</title>
+</head>
+<body style="margin:0; padding:0; background:transparent;">
+    <script>
+        const Streamlit = {
+            setComponentReady: function() {
+                window.parent.postMessage({isStreamlitMessage: true, type: "streamlit:componentReady", apiVersion: 1}, "*");
+            },
+            setFrameHeight: function(height) {
+                window.parent.postMessage({isStreamlitMessage: true, type: "streamlit:setFrameHeight", height: height}, "*");
+            },
+            setComponentValue: function(value) {
+                window.parent.postMessage({isStreamlitMessage: true, type: "streamlit:setComponentValue", value: value}, "*");
+            }
+        };
+
+        Streamlit.setFrameHeight(0);
+        Streamlit.setComponentReady();
+
+        let hasSent = false;
+
+        function requestLocation() {
+            if (hasSent) return;
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        if (hasSent) return;
+                        hasSent = true;
+                        Streamlit.setComponentValue({
+                            status: "success",
+                            lat: position.coords.latitude,
+                            lon: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            ts: Date.now()
+                        });
+                    },
+                    function(error) {
+                        if (hasSent) return;
+                        hasSent = true;
+                        Streamlit.setComponentValue({
+                            status: "error",
+                            code: error.code,
+                            message: error.message,
+                            ts: Date.now()
+                        });
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            } else {
+                if (hasSent) return;
+                hasSent = true;
+                Streamlit.setComponentValue({
+                    status: "unsupported",
+                    ts: Date.now()
+                });
+            }
+        }
+
+        requestLocation();
+    </script>
+</body>
+</html>

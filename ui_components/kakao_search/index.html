@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Kakao Search Component</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent !important;
+            background-color: transparent !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+        .search-container {
+            width: 100%;
+            background: transparent !important;
+            background-color: transparent !important;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 2px 4px;
+        }
+        .input-wrapper {
+            flex: 1 1 auto;
+            min-width: 0;
+            position: relative;
+            background: transparent !important;
+        }
+        input {
+            width: 100%;
+            height: 44px;
+            border-radius: 22px;
+            padding: 0 16px 0 42px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            outline: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+            font-size: 15px;
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: white;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23ffffff" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: 14px center;
+            transition: all 0.2s ease;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        }
+        #myLocBtn {
+            flex: 0 0 44px;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            max-width: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+            transition: all 0.2s ease;
+            padding: 0;
+            flex-shrink: 0;
+        }
+        #myLocBtn:hover {
+            background: rgba(51, 65, 85, 0.95);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+        #myLocBtn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container" id="searchContainer">
+        <div class="input-wrapper">
+            <input type="text" id="searchInput" placeholder="장소, 지번, 역명 검색" onkeydown="handleKeyDown(event)" autocomplete="off"/>
+        </div>
+        <button id="myLocBtn" title="현재 내 위치로 이동" onclick="handleMyLocationClick(event)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const Streamlit = {
+            setComponentReady: function() {
+                window.parent.postMessage({isStreamlitMessage: true, type: "streamlit:componentReady", apiVersion: 1}, "*");
+            },
+            setFrameHeight: function(height) {
+                window.parent.postMessage({isStreamlitMessage: true, type: "streamlit:setFrameHeight", height: height}, "*");
+            },
+            setComponentValue: function(value) {
+                window.parent.postMessage({isStreamlitMessage: true, type: "streamlit:setComponentValue", value: value}, "*");
+            },
+            events: {
+                addEventListener: function(type, callback) {
+                    window.addEventListener("message", function(event) {
+                        if (event.data.type === type) callback(event.data);
+                    });
+                }
+            },
+            RENDER_EVENT: "streamlit:render"
+        };
+
+        function sendValue(value) {
+            Streamlit.setComponentValue(value);
+        }
+
+        let isInternalUpdate = false;
+
+        function updateLayout() {
+            let parentWidth = window.innerWidth;
+            try {
+                if (window.parent && window.parent.innerWidth) {
+                    parentWidth = window.parent.innerWidth;
+                }
+            } catch (e) {
+                parentWidth = window.innerWidth;
+            }
+
+            const container = document.getElementById('searchContainer');
+            const inputWrapper = document.querySelector('.input-wrapper');
+            if (!container) return;
+
+            if (parentWidth <= 480) {
+                container.style.flexDirection = 'column';
+                container.style.alignItems = 'flex-end';
+                container.style.gap = '6px';
+                if (inputWrapper) inputWrapper.style.width = '100%';
+            } else {
+                container.style.flexDirection = 'row';
+                container.style.alignItems = 'center';
+                container.style.gap = '8px';
+                if (inputWrapper) inputWrapper.style.width = 'auto';
+            }
+        }
+
+        window.addEventListener('resize', updateLayout);
+        document.addEventListener('DOMContentLoaded', updateLayout);
+        updateLayout();
+
+        function onRender(event) {
+            const data = event.args;
+            if (data.default_value && !isInternalUpdate) {
+                document.getElementById('searchInput').value = data.default_value;
+            }
+            updateLayout();
+        }
+
+        Streamlit.events.addEventListener(Streamlit.RENDER_EVENT, onRender);
+        Streamlit.setComponentReady();
+
+        function handleMyLocationClick(e) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            const btn = document.getElementById("myLocBtn");
+            if (btn) btn.style.opacity = "0.5";
+            
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        if (btn) btn.style.opacity = "1";
+                        sendValue({
+                            action: "my_location",
+                            lat: position.coords.latitude,
+                            lon: position.coords.longitude,
+                            ts: Date.now()
+                        });
+                    },
+                    function(error) {
+                        if (btn) btn.style.opacity = "1";
+                        alert("현재 위치 정보를 가져올 수 없습니다. 브라우저의 위치 권한을 확인해주세요.");
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                if (btn) btn.style.opacity = "1";
+                alert("이 브라우저에서는 위치 서비스를 지원하지 않습니다.");
+            }
+        }
+
+        function handleKeyDown(e) {
+            isInternalUpdate = true;
+            if (e.key === 'Enter') {
+                const keyword = e.target.value.trim();
+                if (keyword) {
+                    sendValue({action: "submit", value: keyword, ts: Date.now()});
+                }
+            }
+        }
+    </script>
+</body>
+</html>
