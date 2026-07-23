@@ -230,7 +230,59 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "카카오페이", "title": "카카오페이 결제 리워드 & 페이포인트 적립 찬스", "details": "https://pay.kakao.com", "category": "금융 및 앱테크"},
             
             # 핫딜 커뮤니티 (FMKorea 추가됨)
-            {"target": "에펨코리아", "title": "실시간 핫딜 및 초특가 상품 정보(유저 추천)", "details": "https://www.fmkorea.com/hotdeal", "category": "핫딜 커뮤니티"}
+            {"target": "에펨코리아", "title": "실시간 핫딜 및 초특가 상품 정보(유저 추천)", "details": "https://www.fmkorea.com/hotdeal", "category": "핫딜 커뮤니티"},
+
+            # --- 신규 검증 브랜드 추가 ---
+            # 외식 / 패스트푸드 / 피자 / 치킨 / 한식
+            {"target": "서브웨이", "title": "이달의 썹프라이즈 & 앱 전용 쿠폰 혜택", "details": "https://www.subway.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "노브랜드버거", "title": "NBB 앱 쿠폰 & 신메뉴 세트업 프로모션", "details": "https://search.naver.com/search.naver?query=%EB%85%B8%EB%B8%8C%EB%9E%99%EB%93%9C%EB%B2%84%EA%B1%B0", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "프랭크버거", "title": "이달의 경품 이벤트 & 수제버거 할인 혜택", "details": "https://www.frankburger.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "60계치킨", "title": "자사앱 퀴즈/리뷰 이벤트 & 포장 할인", "details": "https://www.60chicken.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "노랑통닭", "title": "신메뉴 출시기념 할인 & 배달앱 제휴 쿠폰", "details": "https://search.naver.com/search.naver?query=%EB%85%B8%EB%9E%9B%ED%86%B5%EB%8B%AD", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "피자알볼로", "title": "방문포장 할인 & 이달의 멤버십 혜택", "details": "https://www.pizzaalvolo.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "7번가피자", "title": "수/목요일 방문포장 최대 40% 할인 혜택", "details": "https://www.7thpizza.com", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "동대문엽기떡볶이", "title": "엽떡앱 주문 시 배달/포장 3,000원 상시 할인", "details": "https://www.yupdduk.com", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "한솥도시락", "title": "1월/8월 한솥 매일할인 & 요일별 특가 프로모션", "details": "https://www.hsd.co.kr/event/event_list", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "두끼", "title": "이달의 황금레시피 콜라보 & 무한리필 혜택", "details": "https://www.dookki.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "역전할머니맥주", "title": "시즌 신메뉴 프로모션 & 모바일 상품권 이벤트", "details": "https://search.naver.com/search.naver?query=%EC%97%AD%EC%A0%84%ED%95%A0%EB%A8%B8%EB%8B%80%EB%A7%A5%EC%A3%BC", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "본죽", "title": "본오더 앱 전용 3,000원 할인 & 페이백 프로모션", "details": "https://www.bonif.co.kr/event/list", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "신전떡볶이", "title": "신전 앱 첫 구매 쿠폰 & 모바일 상품권 이벤트", "details": "http://www.sinjeon.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "홍콩반점0410", "title": "짜장면데이/단무지데이 파격 할인 프로모션", "details": "https://search.naver.com/search.naver?query=%ED%99%8D%EC%BD%A9%EB%B0%98%EC%A0%900410", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "원할머니보쌈", "title": "수요일 방문포장 할인 & 팩 할인 혜택", "details": "https://bossam.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
+
+            # 카페 / 베이커리 / 디저트
+            {"target": "더벤티", "title": "더벤티데이(매월 20일) & 신메뉴 할인 쿠폰", "details": "https://www.theventi.co.kr/new2022/news/event.html", "category": "카페 및 베이커리/디저트"},
+            {"target": "공차", "title": "T멤버십 혜택 & 공차 스탬프 트리플 적립", "details": "https://www.gong-cha.co.kr", "category": "카페 및 베이커리/디저트"},
+            {"target": "할리스", "title": "할리스 레드데이 & 멤버십 프리쿠폰 증정", "details": "https://www.hollys.co.kr/news/event/list.do", "category": "카페 및 베이커리/디저트"},
+            {"target": "던킨", "title": "던킨 도너츠 팩 할인 & 해피오더 픽업 혜택", "details": "https://www.dunkindonuts.co.kr", "category": "카페 및 베이커리/디저트"},
+            {"target": "크리스피크림도넛", "title": "매월 1, 3번째 수요일 오리지널 1+1 & 롯데잇츠 쿠폰", "details": "https://www.lotteeatz.com", "category": "카페 및 베이커리/디저트"},
+            {"target": "요아정", "title": "요아정 앱 첫 구매 할인 & 이달의 토핑 조합 혜택", "details": "https://www.yoajung.co.kr", "category": "카페 및 베이커리/디저트"},
+            {"target": "설빙", "title": "시즌 한정 생과일 빙수 할인 & 기프티콘 프로모션", "details": "https://sulbing.com", "category": "카페 및 베이커리/디저트"},
+            {"target": "폴바셋", "title": "폴바셋 소식지 & 멤버십 크라운 적립 쿠폰", "details": "https://www.baristapaulbassett.co.kr", "category": "카페 및 베이커리/디저트"},
+            {"target": "아티제", "title": "클럽 아티제 페이코 혜택 & 1+1 음료 쿠폰", "details": "https://www.cafeartisee.com", "category": "카페 및 베이커리/디저트"},
+
+            # 대형마트 / SSM / 쇼핑 / 패션
+            {"target": "롯데마트", "title": "롯데마트 전단행사 & 주말 파격 특가 전단지", "details": "https://www.lottemart.com", "category": "대형마트 통합"},
+            {"target": "GS더프레시", "title": "GS수퍼 갓세일 & 매주 수요일 오프라인 파격 세일", "details": "https://www.gsretail.com", "category": "대형마트 통합"},
+            {"target": "이마트에브리데이", "title": "에브리데이 전단 특가 & 쓱데이 연계 할인", "details": "https://www.emarteveryday.co.kr", "category": "대형마트 통합"},
+            {"target": "무인양품", "title": "무지위크(MUJI WEEK) 전 품목 10% 회원 할인", "details": "https://www.muji.kr", "category": "여가 및 쇼핑 혜택"},
+            {"target": "모던하우스", "title": "모던하우스 브랜드데이 20% 세일 & 리빙 특가", "details": "https://search.naver.com/search.naver?query=%EB%AA%A8%EB%8D%98%ED%95%98%EC%9A%B0%EC%8A%A4", "category": "여가 및 쇼핑 혜택"},
+            {"target": "아트박스", "title": "아트박스 멤버십데이 & 신학기/시즌 세일", "details": "https://www.poom.co.kr", "category": "여가 및 쇼핑 혜택"},
+            {"target": "스파오", "title": "스파오 릴레이 세일 & 쿨테크/발열내의 파격 할인", "details": "https://spao.com", "category": "여가 및 쇼핑 혜택"},
+            {"target": "ABC마트", "title": "ABC마트 결산 세일 & 한가위/설날 파격 세일", "details": "https://abcmart.a-rt.com", "category": "여가 및 쇼핑 혜택"},
+            {"target": "무신사스탠다드", "title": "오프라인 매장 전용 앱 쿠폰 & 무진장 세일", "details": "https://www.musinsa.com", "category": "여가 및 쇼핑 혜택"},
+
+            # 테마파크 / 모빌리티 / 주유
+            {"target": "롯데월드", "title": "통신사/카드사 50% 할인 & 이달의 생일/우대 혜택", "details": "https://adventure.lotteworld.com", "category": "여가 및 쇼핑 혜택"},
+            {"target": "에버랜드", "title": "제휴카드 스마트예약 할인 & 이달의 프로모션", "details": "https://www.everland.com", "category": "여가 및 쇼핑 혜택"},
+            {"target": "쏘카", "title": "내 주변 쏘카존 부름 무료 & 주말 대여료 폭탄 할인", "details": "https://www.socar.kr", "category": "여가 및 쇼핑 혜택"},
+            {"target": "GS칼텍스", "title": "에너지플러스 앱 주유 3,000원 할인 & 세차권 쿠폰", "details": "https://www.gscaltex.com", "category": "여가 및 쇼핑 혜택"},
+
+            # 핫딜 커뮤니티
+            {"target": "뽐뿌", "title": "뽐뿌 핫딜 게시판 최신 실시간 인기 핫딜", "details": "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu", "category": "핫딜 커뮤니티"},
+            {"target": "퀘이사존", "title": "퀘이사존 지름/알뜰정보 실시간 핫딜", "details": "https://quasarzone.com/bbs/qb_saleinfo", "category": "핫딜 커뮤니티"},
+            {"target": "어미새", "title": "패션 및 오프라인 쇼핑 실시간 핫딜 정보", "details": "https://eomisae.co.kr", "category": "핫딜 커뮤니티"},
+            {"target": "쿨엔조이", "title": "쿨엔조이 알뜰구매 게시판 최신 핫딜", "details": "https://coolenjoy.net/bbs/jirum", "category": "핫딜 커뮤니티"}
         ]
         
         # 동시성(Thread)을 이용해 50개 업체의 최신 뉴스를 1~2초만에 긁어와 병합
