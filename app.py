@@ -226,14 +226,36 @@ st.markdown(f"""
         box-shadow: none !important;
     }}
     
+    /* Streamlit Toast Notification Elevation & Mobile Centering */
+    [data-testid="stToastContainer"] {{
+        z-index: 999999 !important;
+        position: fixed !important;
+    }}
+    
     @media (max-width: 480px) {{
         div[data-testid="element-container"]:has(.kmap-search-anchor) + div[data-testid="element-container"] {{
             top: 85px !important;
             max-width: 340px !important;
         }}
         div[data-testid="element-container"]:has(.kmap-search-anchor) + div[data-testid="element-container"] iframe {{
-            height: 105px !important;
-            min-height: 105px !important;
+            height: 60px !important;
+            min-height: 60px !important;
+        }}
+        [data-testid="stToastContainer"] {{
+            top: 20px !important;
+            bottom: auto !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            right: auto !important;
+            width: 90% !important;
+            max-width: 340px !important;
+        }}
+        [data-testid="stToast"] {{
+            width: 100% !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+            border-radius: 14px !important;
+            background: rgba(30, 41, 59, 0.95) !important;
+            color: #ffffff !important;
         }}
     }}
     
@@ -729,11 +751,15 @@ def handle_search():
             st.session_state["map_key_id"] += 1
             st.session_state["data_view"] = "내 주변 맞춤 혜택"
             st.session_state["map_click_disabled"] = False
+            st.session_state.pop("_search_error", None)
             if "local_results" in st.session_state:
                 del st.session_state["local_results"]
             st.rerun()
         else:
-            st.toast(f"'{sq}'의 위치를 찾을 수 없습니다.", icon="❌")
+            err_msg = f"'{sq}'의 위치를 찾을 수 없습니다."
+            st.session_state["_search_error"] = err_msg
+            st.toast(err_msg, icon="❌")
+            st.rerun()
 
 # --- Top Navigation ---
 col_menu1, col_menu2 = st.columns(2)
@@ -752,6 +778,10 @@ with col_menu2:
     st.button("🔥 전국구 핫딜", type="primary" if curr_view == "전국구 핫딜" else "secondary", use_container_width=True, on_click=set_view_global)
 
 st.markdown("<br/>", unsafe_allow_html=True)
+
+if st.session_state.get("_search_error"):
+    st.warning(st.session_state["_search_error"], icon="⚠️")
+    st.session_state.pop("_search_error", None)
 
 # --- Ensure coordinates are globally available for map rendering ---
 lat_input = st.session_state["map_lat"]

@@ -7,6 +7,9 @@ from typing import Tuple, List, Dict
 from requests.adapters import HTTPAdapter
 from services.logger_utils import setup_logger
 
+import urllib.parse
+from config import settings
+
 logger = setup_logger(__name__)
 
 # Shared requests Session with HTTP connection pooling for fast parallel network requests
@@ -113,16 +116,17 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
 
     headers = {
         'Referer': 'https://map.kakao.com/',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
     seen = set()
     results = []
     for q in queries:
-        url1 = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={q}&x={lon_round}&y={lat_round}&page=1&msFlag=A&sort=0" if (lat_round and lon_round) else f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={q}&page=1&msFlag=A&sort=0"
+        encoded_q = urllib.parse.quote(q)
+        url1 = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={encoded_q}&x={lon_round}&y={lat_round}&page=1&msFlag=A&sort=0" if (lat_round and lon_round) else f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={encoded_q}&page=1&msFlag=A&sort=0"
         try:
             resp = _session.get(url1, headers=headers, timeout=4)
             text = resp.text
-            if '(' in text:
+            if '(' in text and ')' in text:
                 text = text[text.index('(')+1:text.rindex(')')]
             data = json.loads(text)
             places = data.get('place', [])
@@ -151,10 +155,10 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
             # If page 1 had 15 results, fetch pages 2 and 3 for full coverage
             if len(places) >= 15 and len(results) < 100:
                 for page in (2, 3):
-                    url_p = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={q}&x={lon_round}&y={lat_round}&page={page}&msFlag=A&sort=0" if (lat_round and lon_round) else f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={q}&page={page}&msFlag=A&sort=0"
+                    url_p = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={encoded_q}&x={lon_round}&y={lat_round}&page={page}&msFlag=A&sort=0" if (lat_round and lon_round) else f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={encoded_q}&page={page}&msFlag=A&sort=0"
                     resp_p = _session.get(url_p, headers=headers, timeout=4)
                     text_p = resp_p.text
-                    if '(' in text_p:
+                    if '(' in text_p and ')' in text_p:
                         text_p = text_p[text_p.index('(')+1:text_p.rindex(')')]
                     data_p = json.loads(text_p)
                     places_p = data_p.get('place', [])
@@ -235,15 +239,41 @@ class LocationService:
         return R * c
 
     def search_place(self, keyword: str) -> Tuple[float, float]:
-        url = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={keyword}&msFlag=A&sort=0"
-        headers = {
+        if not keyword or not keyword.strip():
+            return None, None
+            
+        clean_kw = keyword.strip()
+        encoded_kw = urllib.parse.quote(clean_kw)
+
+        # Tier 1: Official Kakao REST API (If KAKAO_API_KEY is configured in settings or environment)
+        kakao_key = getattr(settings, 'kakao_api_key', None) or os.getenv('KAKAO_API_KEY')
+        if kakao_key:
+            headers = {"Authorization": f"KakaoAK {kakao_key}"}
+            for endpoint in ["keyword", "address"]:
+                url = f"https://dapi.kakao.com/v2/local/search/{endpoint}.json?query={encoded_kw}"
+                try:
+                    resp = _session.get(url, headers=headers, timeout=4)
+                    if resp.status_code == 200:
+                        docs = resp.json().get("documents", [])
+                        if docs:
+                            lat = docs[0].get("y") or docs[0].get("lat")
+                            lon = docs[0].get("x") or docs[0].get("lng")
+                            if lat and lon:
+                                logger.info(f"Kakao REST API Search Success for '{clean_kw}': {lat}, {lon}")
+                                return float(lat), float(lon)
+                except Exception as e:
+                    logger.warning(f"Kakao REST API ({endpoint}) failed for '{clean_kw}': {e}")
+
+        # Tier 2: Kakao Web Search (with URL encoding)
+        url_kakao_web = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={encoded_kw}&msFlag=A&sort=0"
+        headers_kakao_web = {
             'Referer': 'https://map.kakao.com/',
-            'User-Agent': 'Mozilla/5.0'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         }
         try:
-            resp = _session.get(url, headers=headers, timeout=5)
+            resp = _session.get(url_kakao_web, headers=headers_kakao_web, timeout=4)
             text = resp.text
-            if '(' in text:
+            if '(' in text and ')' in text:
                 text = text[text.index('(')+1:text.rindex(')')]
             data = json.loads(text)
             places = data.get('place', [])
@@ -251,7 +281,28 @@ class LocationService:
                 p_lat = p.get("lat")
                 p_lon = p.get("lon")
                 if p_lat and p_lon:
+                    logger.info(f"Kakao Web Search Success for '{clean_kw}': {p_lat}, {p_lon}")
                     return float(p_lat), float(p_lon)
         except Exception as e:
-            logger.exception(f"Failed to search place {keyword}: {e}")
+            logger.warning(f"Kakao Web Search failed for '{clean_kw}': {e}")
+
+        # Tier 3: OpenStreetMap Nominatim Geocoding Fallback (Works globally & on Streamlit Cloud without IP blocking)
+        url_nom = f"https://nominatim.openstreetmap.org/search?q={encoded_kw}&format=json&countrycodes=kr"
+        headers_nom = {
+            'User-Agent': 'InfoWavesApp/1.0 (https://infowaves.streamlit.app)'
+        }
+        try:
+            resp = _session.get(url_nom, headers=headers_nom, timeout=4)
+            if resp.status_code == 200:
+                results = resp.json()
+                if results:
+                    lat = results[0].get("lat")
+                    lon = results[0].get("lon")
+                    if lat and lon:
+                        logger.info(f"OpenStreetMap Nominatim Search Success for '{clean_kw}': {lat}, {lon}")
+                        return float(lat), float(lon)
+        except Exception as e:
+            logger.warning(f"Nominatim Search failed for '{clean_kw}': {e}")
+
         return None, None
+

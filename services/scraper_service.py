@@ -152,7 +152,7 @@ class HybridOfficialScraper(AbstractScraper):
         base_data = [
             # 편의점
             {"target": "CU", "title": "쓔퍼세일 & 이달의 1+1/2+1 득템 혜택", "details": "https://cu.bgfretail.com/event/plus.do", "category": "편의점 혜택"},
-            {"target": "GS25", "title": "갓세일 & 나만의냉장고 1+1 기획전", "details": "http://gs25.gsretail.com/gscvs/ko/products/event-goods", "category": "편의점 혜택"},
+            {"target": "GS25", "title": "갓세일 & 나만의냉장고 1+1 기획전", "details": "https://gs25.gsretail.com/gscvs/ko/products/event-goods", "category": "편의점 혜택"},
             {"target": "세븐일레븐", "title": "세븐일레븐데이 & 이달의 와인장터 혜택", "details": "https://www.7-eleven.co.kr/product/presentList.asp", "category": "편의점 혜택"},
             {"target": "이마트24", "title": "이달의 반값 할인 & 1+1 정기행사", "details": "https://emart24.co.kr/goods/event", "category": "편의점 혜택"},
             
@@ -178,7 +178,7 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "가마치통닭", "title": "두 마리 포장 할인 특가 & 치맥 프로모션", "details": "https://www.gamachi.co.kr/event", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "자담치킨", "title": "맵슐랭/티키타코 신메뉴 세트 할인 혜택", "details": "https://ejadam.co.kr/bbs/board.php?bo_table=event", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "굽네치킨", "title": "고추바사삭 할인 기획전 & 배달앱 제휴 프로모션", "details": "https://www.goobne.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
-            {"target": "천년닭강정", "title": "패밀리 사이즈 포장 할인 & 배달 리뷰 이벤트", "details": "https://www.gamachi.co.kr/event", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "천년닭강정", "title": "패밀리 사이즈 포장 할인 & 배달 리뷰 이벤트", "details": "https://search.naver.com/search.naver?query=%EC%B2%A3%EB%85%84%EB%8B%AD%EA%B0%95%EC%A0%95", "category": "외식/패스트푸드 및 피자/치킨"},
             
             # 베이커리 / 디저트
             {"target": "파리바게뜨", "title": "매월 1일 파바데이 & 해피오더 픽업 할인", "details": "https://www.paris.co.kr/promotion", "category": "카페 및 베이커리/디저트"},
@@ -192,10 +192,10 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "컴포즈커피", "title": "컴포즈 앱 멤버십 쿠폰 & 신메뉴 할인 프로모션", "details": "https://composecoffee.com/event", "category": "카페 및 베이커리/디저트"},
             {"target": "빽다방", "title": "빽다방 앱 스탬프 적립 & 앗!메리카노 특가", "details": "https://paikdabang.com/news/", "category": "카페 및 베이커리/디저트"},
             {"target": "이디야커피", "title": "이디야 멤버스 스탬프 쿠폰 & 이달의 콜라보 혜택", "details": "https://www.ediya.com/contents/event.html", "category": "카페 및 베이커리/디저트"},
-            {"target": "우지커피", "title": "앱 오더 할인 쿠폰 & 시즌 한정 음료 이벤트", "details": "http://www.ouzeecoffee.com/board/bbs/board.php?bo_table=event", "category": "카페 및 베이커리/디저트"},
+            {"target": "우지커피", "title": "앱 오더 할인 쿠폰 & 시즌 한정 음료 이벤트", "details": "https://search.naver.com/search.naver?query=%EC%9A%B0%EC%A7%80%EC%BB%A4%ED%94%B9", "category": "카페 및 베이커리/디저트"},
             {"target": "엔제리너스", "title": "롯데잇츠 앱 쿠폰 & 네고왕 반값 프로모션", "details": "https://www.lotteeatz.com", "category": "카페 및 베이커리/디저트"},
             {"target": "매머드커피", "title": "매머드오더 선결제 할인 & 대용량 사이즈업 특가", "details": "https://www.mmthcoffee.com", "category": "카페 및 베이커리/디저트"},
-            {"target": "투썸플레이스", "title": "투썸하트 피스케이크 증정 & 시즌 음료 혜택", "details": "https://mo.twosome.co.kr/ev/eventList.do", "category": "카페 및 베이커리/디저트"},
+            {"target": "투썸플레이스", "title": "투썸하트 피스케이크 증정 & 시즌 음료 혜택", "details": "https://www.twosome.co.kr", "category": "카페 및 베이커리/디저트"},
             
             # H&B 스토어
             {"target": "올리브영", "title": "올영세일(분기별) & 올리브영 데이(매월 25~27일)", "details": "https://www.oliveyoung.co.kr/store/main/getSaleList.do", "category": "H&B 스토어"},
@@ -216,9 +216,9 @@ class HybridOfficialScraper(AbstractScraper):
             
             # 의류 / 영화관
             {"target": "유니클로", "title": "유니클로 감사제 & 기간 한정 가격인하(세일)", "details": "https://www.uniqlo.com/kr/ko/", "category": "여가 및 쇼핑 혜택"},
-            {"target": "탑텐", "title": "탑텐 텐텐데이 & 행복제 1+1 폭탄 세일", "details": "https://topten.topten10mall.com", "category": "여가 및 쇼핑 혜택"},
+            {"target": "탑텐", "title": "탑텐 텐텐데이 & 행복제 1+1 폭탄 세일", "details": "https://search.naver.com/search.naver?query=%ED%83%9F%ED%85%90", "category": "여가 및 쇼핑 혜택"},
             {"target": "메가박스", "title": "메가박스 빵원티켓 & 오리지널 티켓 증정 이벤트", "details": "https://www.megabox.co.kr/event", "category": "여가 및 쇼핑 혜택"},
-            {"target": "CGV", "title": "CGV 스피드쿠폰 & IMAX 스페셜 포스터 굿즈 혜택", "details": "http://www.cgv.co.kr/culture-event/event/defaultNew.aspx", "category": "여가 및 쇼핑 혜택"},
+            {"target": "CGV", "title": "CGV 스피드쿠폰 & IMAX 스페셜 포스터 굿즈 혜택", "details": "https://www.cgv.co.kr/culture-event/event/defaultNew.aspx", "category": "여가 및 쇼핑 혜택"},
             {"target": "롯데시네마", "title": "롯데시네마 싸다구 예매 & 콤보 선착순 할인", "details": "https://www.lottecinema.co.kr/NLCHS/Event", "category": "여가 및 쇼핑 혜택"},
             
             # 통신사 / 금융

@@ -3161,3 +3161,224 @@ Exception: Kakao Map API Network Timeout
 2026-07-22 22:25:14,954 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
 2026-07-22 22:25:17,889 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
 2026-07-22 22:25:18,766 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 22:41:15,718 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-22 22:41:19,305 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 22:41:20,039 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 22:41:20,040 - app - INFO - 📍 Device Real Location Initialized: 37.360617, 126.920312
+2026-07-22 22:41:21,293 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:34:39,521 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-22 23:34:43,212 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:34:44,087 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:34:44,089 - app - INFO - 📍 Device Real Location Initialized: 37.360605, 126.920274
+2026-07-22 23:34:44,838 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:34:46,688 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:34:46,715 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.3606, 126.92027, 반경: 3.0km)...
+2026-07-22 23:34:47,500 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.361, 126.92 -> 산본2동
+2026-07-22 23:34:48,078 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:47:40,404 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-22 23:47:44,273 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:47:45,163 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:47:45,165 - app - INFO - 📍 Device Real Location Initialized: 37.360623, 126.920291
+2026-07-22 23:47:45,911 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:53:46,136 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:53:46,164 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36062, 126.92029, 반경: 3.0km)...
+2026-07-22 23:53:46,568 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.361, 126.92 -> 산본2동
+2026-07-22 23:53:47,603 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:53:59,980 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:54:05,641 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-22 23:54:13,805 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:28,447 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 00:31:33,322 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:34,644 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:34,646 - app - INFO - 📍 Device Real Location Initialized: 37.360636, 126.920268
+2026-07-23 00:31:35,511 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:39,607 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:46,729 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:48,060 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:51,231 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:53,177 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:31:53,202 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.38, 127.229, 반경: 0.5km)...
+2026-07-23 00:31:54,102 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.38, 127.229 -> 태전동
+2026-07-23 00:31:56,658 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:32:35,576 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:32:36,718 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:32:40,408 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:32:41,840 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:34:44,303 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:34:44,323 - app - INFO - 📍 Returning to My Device Location: (37.360586, 126.920358)
+2026-07-23 00:34:45,542 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:34:48,095 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:34:48,121 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36059, 126.92036, 반경: 0.5km)...
+2026-07-23 00:34:49,041 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.361, 126.92 -> 산본2동
+2026-07-23 00:34:50,085 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:34:55,715 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:34:57,126 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:35:04,070 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 00:35:05,193 - services.location_service - INFO - 📍 IP-based Location: 37.5332, 126.9692
+2026-07-23 20:24:49,724 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:24:53,588 - services.location_service - INFO - 📍 IP-based Location: 37.5656, 126.978
+2026-07-23 20:24:53,610 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:24:55,533 - services.location_service - INFO - 📍 IP-based Location: 37.5656, 126.978
+2026-07-23 20:24:55,543 - services.location_service - ERROR - Failed to reverse geocode: OpenStreetMap Network Timeout Error
+Traceback (most recent call last):
+  File "/Users/steady/.openclaw/workspace/info_waves/services/location_service.py", line 32, in _cached_get_neighborhood
+    resp = _session.get(url, headers=headers, params=params, timeout=5)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1104, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1108, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1163, in _execute_mock_call
+    raise effect
+Exception: OpenStreetMap Network Timeout Error
+2026-07-23 20:24:55,550 - services.location_service - WARNING - Failed to fetch IP-based location (Timeout/Network): IP API Timeout
+2026-07-23 20:24:55,563 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:24:55,566 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:24:57,086 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.498, 127.028 -> 역삼1동
+2026-07-23 20:24:57,604 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.522, 126.924 -> 여의도동
+2026-07-23 20:24:58,731 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.557, 126.924 -> 동교동
+2026-07-23 20:24:59,733 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.36, 126.92 -> 산본2동
+2026-07-23 20:25:00,801 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.395, 127.111 -> 백현동
+2026-07-23 20:25:01,705 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.266, 127.0 -> 매산로1가
+2026-07-23 20:25:02,062 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.489, 126.725 -> 부평동
+2026-07-23 20:25:02,603 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 35.158, 129.059 -> 범전동
+2026-07-23 20:25:03,913 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 35.871, 128.594 -> 포정동
+2026-07-23 20:25:07,063 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 36.358, 127.382 -> 둔산동
+2026-07-23 20:25:07,100 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:25:07,452 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.361, 126.928 -> 산본2동
+2026-07-23 20:25:07,458 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.36, 126.928 -> 산본동
+2026-07-23 20:25:07,479 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:25:07,550 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:25:07,551 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:25:07,551 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:25:07,552 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:25:07,552 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:25:07,553 - services.location_service - ERROR - Failed to search place 강남역: Kakao Map API Network Timeout
+Traceback (most recent call last):
+  File "/Users/steady/.openclaw/workspace/info_waves/services/location_service.py", line 244, in search_place
+    resp = _session.get(url, headers=headers, timeout=5)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1104, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1108, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1163, in _execute_mock_call
+    raise effect
+Exception: Kakao Map API Network Timeout
+2026-07-23 20:28:02,833 - services.location_service - ERROR - Failed to reverse geocode: OpenStreetMap Network Timeout Error
+Traceback (most recent call last):
+  File "/Users/steady/.openclaw/workspace/info_waves/services/location_service.py", line 35, in _cached_get_neighborhood
+    resp = _session.get(url, headers=headers, params=params, timeout=5)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1104, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1108, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1163, in _execute_mock_call
+    raise effect
+Exception: OpenStreetMap Network Timeout Error
+2026-07-23 20:28:02,837 - services.location_service - WARNING - Failed to fetch IP-based location (Timeout/Network): IP API Timeout
+2026-07-23 20:28:02,838 - services.location_service - INFO - Kakao Web Search Success for '산본역': 37.3584, 126.9331
+2026-07-23 20:28:02,846 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:28:02,848 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:03,015 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.498, 127.028 -> 역삼1동
+2026-07-23 20:28:03,071 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.522, 126.924 -> 여의도동
+2026-07-23 20:28:03,160 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.557, 126.924 -> 동교동
+2026-07-23 20:28:03,239 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.36, 126.92 -> 산본2동
+2026-07-23 20:28:03,302 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.395, 127.111 -> 백현동
+2026-07-23 20:28:03,363 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.266, 127.0 -> 매산로1가
+2026-07-23 20:28:03,422 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.489, 126.725 -> 부평동
+2026-07-23 20:28:03,488 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 35.158, 129.059 -> 범전동
+2026-07-23 20:28:03,553 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 35.871, 128.594 -> 포정동
+2026-07-23 20:28:03,617 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 36.358, 127.382 -> 둔산동
+2026-07-23 20:28:04,167 - services.location_service - INFO - Kakao Web Search Success for '태성로 107': 37.37999621, 127.22899545
+2026-07-23 20:28:04,191 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:04,244 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.361, 126.928 -> 산본2동
+2026-07-23 20:28:04,248 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.36, 126.928 -> 산본동
+2026-07-23 20:28:31,282 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:28:33,279 - services.location_service - INFO - 📍 IP-based Location: 37.5656, 126.978
+2026-07-23 20:28:33,312 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:28:35,042 - services.location_service - INFO - 📍 IP-based Location: 37.5656, 126.978
+2026-07-23 20:28:35,054 - services.location_service - ERROR - Failed to reverse geocode: OpenStreetMap Network Timeout Error
+Traceback (most recent call last):
+  File "/Users/steady/.openclaw/workspace/info_waves/services/location_service.py", line 35, in _cached_get_neighborhood
+    resp = _session.get(url, headers=headers, params=params, timeout=5)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1104, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1108, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1163, in _execute_mock_call
+    raise effect
+Exception: OpenStreetMap Network Timeout Error
+2026-07-23 20:28:35,062 - services.location_service - WARNING - Failed to fetch IP-based location (Timeout/Network): IP API Timeout
+2026-07-23 20:28:35,064 - services.location_service - INFO - Kakao Web Search Success for '산본역': 37.3584, 126.9331
+2026-07-23 20:28:35,076 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:28:35,078 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:35,438 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.498, 127.028 -> 역삼1동
+2026-07-23 20:28:35,502 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.522, 126.924 -> 여의도동
+2026-07-23 20:28:35,563 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.557, 126.924 -> 동교동
+2026-07-23 20:28:35,630 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.36, 126.92 -> 산본2동
+2026-07-23 20:28:35,683 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.395, 127.111 -> 백현동
+2026-07-23 20:28:35,741 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.266, 127.0 -> 매산로1가
+2026-07-23 20:28:35,827 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.489, 126.725 -> 부평동
+2026-07-23 20:28:35,889 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 35.158, 129.059 -> 범전동
+2026-07-23 20:28:35,981 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 35.871, 128.594 -> 포정동
+2026-07-23 20:28:36,037 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 36.358, 127.382 -> 둔산동
+2026-07-23 20:28:36,586 - services.location_service - INFO - Kakao Web Search Success for '태성로 107': 37.37999621, 127.22899545
+2026-07-23 20:28:36,611 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:36,674 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.361, 126.928 -> 산본2동
+2026-07-23 20:28:36,678 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.36, 126.928 -> 산본동
+2026-07-23 20:28:36,821 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:36,828 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:36,828 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:36,829 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:36,829 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:36,830 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:28:36,831 - services.location_service - WARNING - Kakao Web Search failed for '강남역': Kakao Map API Network Timeout
+2026-07-23 20:28:36,832 - services.location_service - WARNING - Nominatim Search failed for '강남역': Kakao Map API Network Timeout
+2026-07-23 20:29:00,593 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:29:02,371 - services.location_service - INFO - 📍 IP-based Location: 37.5656, 126.978
+2026-07-23 20:29:02,398 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:29:04,316 - services.location_service - INFO - 📍 IP-based Location: 37.5656, 126.978
+2026-07-23 20:29:04,326 - services.location_service - ERROR - Failed to reverse geocode: OpenStreetMap Network Timeout Error
+Traceback (most recent call last):
+  File "/Users/steady/.openclaw/workspace/info_waves/services/location_service.py", line 35, in _cached_get_neighborhood
+    resp = _session.get(url, headers=headers, params=params, timeout=5)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1104, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1108, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1163, in _execute_mock_call
+    raise effect
+Exception: OpenStreetMap Network Timeout Error
+2026-07-23 20:29:04,335 - services.location_service - WARNING - Failed to fetch IP-based location (Timeout/Network): IP API Timeout
+2026-07-23 20:29:04,337 - services.location_service - INFO - Kakao Web Search Success for '산본역': 37.3584, 126.9331
+2026-07-23 20:29:04,349 - main - INFO - 글로벌(위치 무관) 데이터 스크래핑을 시작합니다...
+2026-07-23 20:29:04,352 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:04,534 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.498, 127.028 -> 역삼1동
+2026-07-23 20:29:04,597 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.522, 126.924 -> 여의도동
+2026-07-23 20:29:04,649 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.557, 126.924 -> 동교동
+2026-07-23 20:29:04,706 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.36, 126.92 -> 산본2동
+2026-07-23 20:29:04,755 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.395, 127.111 -> 백현동
+2026-07-23 20:29:04,809 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.266, 127.0 -> 매산로1가
+2026-07-23 20:29:04,876 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.489, 126.725 -> 부평동
+2026-07-23 20:29:04,948 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 35.158, 129.059 -> 범전동
+2026-07-23 20:29:05,016 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 35.871, 128.594 -> 포정동
+2026-07-23 20:29:05,078 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 36.358, 127.382 -> 둔산동
+2026-07-23 20:29:06,384 - services.location_service - INFO - Kakao Web Search Success for '태성로 107': 37.37999621, 127.22899545
+2026-07-23 20:29:06,408 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:06,478 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.361, 126.928 -> 산본2동
+2026-07-23 20:29:06,482 - services.location_service - INFO - OpenStreetMap Reverse Geocoding: 37.36, 126.928 -> 산본동
+2026-07-23 20:29:11,143 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:11,157 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:11,157 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:11,158 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:11,158 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:11,159 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:11,160 - services.location_service - WARNING - Kakao Web Search failed for '강남역': Kakao Map API Network Timeout
+2026-07-23 20:29:11,160 - services.location_service - WARNING - Nominatim Search failed for '강남역': Kakao Map API Network Timeout
+2026-07-23 20:29:34,375 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:34,386 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:34,387 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:34,388 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:34,388 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:34,389 - main - INFO - 로컬(위치 기반) 데이터 역매핑을 시작합니다 (좌표: 37.36066, 126.92819, 반경: 3.0km)...
+2026-07-23 20:29:34,391 - services.location_service - WARNING - Kakao Web Search failed for '강남역': Kakao Map API Network Timeout
+2026-07-23 20:29:34,391 - services.location_service - WARNING - Nominatim Search failed for '강남역': Kakao Map API Network Timeout

@@ -132,30 +132,14 @@
         let isInternalUpdate = false;
 
         function updateLayout() {
-            let parentWidth = window.innerWidth;
-            try {
-                if (window.parent && window.parent.innerWidth) {
-                    parentWidth = window.parent.innerWidth;
-                }
-            } catch (e) {
-                parentWidth = window.innerWidth;
-            }
-
             const container = document.getElementById('searchContainer');
             const inputWrapper = document.querySelector('.input-wrapper');
             if (!container) return;
 
-            if (parentWidth <= 480) {
-                container.style.flexDirection = 'column';
-                container.style.alignItems = 'flex-end';
-                container.style.gap = '6px';
-                if (inputWrapper) inputWrapper.style.width = '100%';
-            } else {
-                container.style.flexDirection = 'row';
-                container.style.alignItems = 'center';
-                container.style.gap = '8px';
-                if (inputWrapper) inputWrapper.style.width = 'auto';
-            }
+            container.style.flexDirection = 'row';
+            container.style.alignItems = 'center';
+            container.style.gap = '8px';
+            if (inputWrapper) inputWrapper.style.width = '100%';
         }
 
         window.addEventListener('resize', updateLayout);

@@ -239,27 +239,32 @@ def inject_global_clipboard_script():
     """
     components.html(js, width=0, height=0)
 
+import html
+
 def generate_card_html(brand: str, title: str, link: str, branches: list = None) -> str:
     """
     Generates a self-contained HTML card with embedded inline styles.
-    - Clicking the card header/title area opens the detail link directly.
+    - Clicking the card header/title area opens the detail link directly in a new tab.
     - Branch list is collapsible under "주변 매칭" label.
     - Each branch shows road address as inline tooltip on hover with copy button.
     """
     logo_url = get_brand_logo(brand)
-    fallback_url = f"https://www.google.com/s2/favicons?domain=google.com&sz=128"
+    fallback_url = "https://www.google.com/s2/favicons?domain=google.com&sz=128"
 
-    href = link if link.startswith("http") else f"https://search.naver.com/search.naver?query={link}"
+    href = link if (link and link.startswith("http")) else f"https://search.naver.com/search.naver?query={html.escape(link or brand)}"
+
+    escaped_brand = html.escape(str(brand or ""))
+    escaped_title = html.escape(str(title or ""))
 
     # Branch section: collapsible "주변 매칭"
     branches_html = ""
     if branches:
         branch_items = ""
         for b in branches:
-            name = b.get('target', '')
-            road_addr = b.get('road_address', '') or b.get('address', '')
+            name = html.escape(str(b.get('target', '')))
+            road_addr = str(b.get('road_address', '') or b.get('address', ''))
             # Escape special characters for safe JS/HTML embedding
-            safe_addr = road_addr.replace('"', '&quot;').replace('\n', ' ').replace('\r', '')
+            safe_addr = road_addr.replace('"', '&quot;').replace("'", "&#39;").replace('\n', ' ').replace('\r', '')
             
             if road_addr:
                 branch_items += (
@@ -292,19 +297,19 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
     card_html = (
         f'<div id="{card_id}" class="info-card">'
 
-        # Clickable area: logo + brand + title → opens detail link
+        # Clickable area: logo + brand + title → opens detail link in a new window
         f'<a href="{href}" target="_blank" rel="noopener noreferrer" class="info-card-link">'
 
         # Card header: logo + brand name
         f'<div class="info-card-header">'
         f'<img src="{logo_url}" '
         f'onerror="this.onerror=null;this.src=\'{fallback_url}\';" '
-        f'class="info-card-logo" alt="{brand}" referrerpolicy="no-referrer" />'
-        f'<span class="info-card-brand">{brand}</span>'
+        f'class="info-card-logo" alt="{escaped_brand}" referrerpolicy="no-referrer" />'
+        f'<span class="info-card-brand">{escaped_brand}</span>'
         f'</div>'
 
         # Card body: title
-        f'<div class="info-card-title">{title}</div>'
+        f'<div class="info-card-title">{escaped_title}</div>'
 
         f'</a>'
 
@@ -322,18 +327,20 @@ def generate_mini_popup_html(brand: str, title: str, link: str) -> str:
     """
     logo_url = get_brand_logo(brand)
     fallback_url = "https://www.google.com/s2/favicons?domain=google.com&sz=128"
-    href = link if link.startswith("http") else f"https://search.naver.com/search.naver?query={link}"
+    href = link if (link and link.startswith("http")) else f"https://search.naver.com/search.naver?query={html.escape(link or brand)}"
+    escaped_brand = html.escape(str(brand or ""))
+    escaped_title = html.escape(str(title or ""))
     
     return f"""
     <div style="font-family: 'Pretendard', -apple-system, sans-serif; min-width: 200px; padding: 4px;">
         <div style="display: flex; align-items: center; margin-bottom: 8px;">
             <img src="{logo_url}" onerror="this.onerror=null;this.src='{fallback_url}';" style="width: 24px; height: 24px; border-radius: 6px; margin-right: 8px; border: 1px solid #e5e7eb; object-fit: contain; background: white;" />
-            <strong style="font-size: 14px; color: #111827;">{brand}</strong>
+            <strong style="font-size: 14px; color: #111827;">{escaped_brand}</strong>
         </div>
         <div style="font-size: 13px; color: #4B5563; margin-bottom: 12px; line-height: 1.4; word-break: keep-all;">
-            {title}
+            {escaped_title}
         </div>
-        <a href="{href}" target="_blank" style="font-size: 12px; color: #2563EB; text-decoration: none; font-weight: 700;">자세히 보기</a>
+        <a href="{href}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: #2563EB; text-decoration: none; font-weight: 700;">자세히 보기</a>
     </div>
     """
 
