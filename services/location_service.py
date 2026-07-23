@@ -20,28 +20,49 @@ _session.mount("https://", _adapter)
 
 @functools.lru_cache(maxsize=256)
 def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
-    url = "https://nominatim.openstreetmap.org/reverse"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    # Tier 1: Official Kakao REST API coord2regioncode (If KAKAO_API_KEY is configured)
+    kakao_key = getattr(settings, 'kakao_api_key', None) or os.getenv('KAKAO_API_KEY')
+    if kakao_key:
+        url_kakao = f"https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x={lon_round}&y={lat_round}"
+        headers_kakao = {"Authorization": f"KakaoAK {kakao_key}"}
+        try:
+            resp = _session.get(url_kakao, headers=headers_kakao, timeout=4)
+            if resp.status_code == 200:
+                docs = resp.json().get("documents", [])
+                if docs:
+                    region = docs[0].get("region_3depth_name") or docs[0].get("region_2depth_name")
+                    if region:
+                        logger.info(f"Kakao Reverse Geocoding: {lat_round}, {lon_round} -> {region}")
+                        return region
+        except Exception as e:
+            logger.warning(f"Kakao Reverse Geocoding failed ({e})")
+
+    # Tier 2: OpenStreetMap Nominatim with Official App User-Agent (Prevents HTTP 429 rate limit blocks)
+    url_nom = "https://nominatim.openstreetmap.org/reverse"
+    headers_nom = {
+        "User-Agent": "InfoWavesApp/1.0 (https://infowaves.streamlit.app)",
         "Accept-Language": "ko"
     }
-    params = {
+    params_nom = {
         "lat": lat_round,
         "lon": lon_round,
         "format": "json",
         "zoom": 14
     }
     try:
-        resp = _session.get(url, headers=headers, params=params, timeout=5)
-        resp.raise_for_status()
-        data = resp.json()
-        address = data.get("address", {})
-        neighborhood = address.get('quarter') or address.get('suburb') or address.get('city_district') or address.get('borough') or address.get('town') or address.get('city', '서울')
-        logger.info(f"OpenStreetMap Reverse Geocoding: {lat_round}, {lon_round} -> {neighborhood}")
-        return neighborhood
+        resp = _session.get(url_nom, headers=headers_nom, params=params_nom, timeout=4)
+        if resp.status_code == 200:
+            data = resp.json()
+            address = data.get("address", {})
+            neighborhood = address.get('quarter') or address.get('suburb') or address.get('city_district') or address.get('borough') or address.get('town') or address.get('city', '서울')
+            logger.info(f"OpenStreetMap Reverse Geocoding: {lat_round}, {lon_round} -> {neighborhood}")
+            return neighborhood
+        else:
+            logger.warning(f"Nominatim Reverse Geocoding HTTP {resp.status_code}")
     except Exception as e:
-        logger.exception(f"Failed to reverse geocode: {e}")
-        return "여의도동"
+        logger.warning(f"Failed to reverse geocode ({e})")
+
+    return "여의도동"
 
 import os
 import sqlite3
