@@ -151,7 +151,7 @@ class HybridOfficialScraper(AbstractScraper):
     def scrape(self) -> List[Dict[str, str]]:
         base_data = [
             # 편의점
-            {"target": "CU", "title": "쓔퍼세일 & 이달의 1+1/2+1 득템 혜택", "details": "https://cu.bgfretail.com/event/plus.do", "category": "편의점 혜택"},
+            {"target": "CU", "title": "쓔퍼세일 & 이달의 1+1/2+1 득템 혜택", "details": "https://cu.bgfretail.com/event/plus.do?category=event", "category": "편의점 혜택"},
             {"target": "GS25", "title": "갓세일 & 나만의냉장고 1+1 기획전", "details": "https://gs25.gsretail.com/gscvs/ko/products/event-goods", "category": "편의점 혜택"},
             {"target": "세븐일레븐", "title": "세븐일레븐데이 & 이달의 와인장터 혜택", "details": "https://www.7-eleven.co.kr/product/presentList.asp", "category": "편의점 혜택"},
             {"target": "이마트24", "title": "이달의 반값 할인 & 1+1 정기행사", "details": "https://emart24.co.kr/goods/event", "category": "편의점 혜택"},

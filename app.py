@@ -969,7 +969,7 @@ if curr_view == "내 주변 맞춤 혜택":
                     
                 for (brand, title, link), branch_items in grouped_items.items():
                     card = generate_card_html(brand, title, link, branch_items)
-                    st.html(card)
+                    st.markdown(card, unsafe_allow_html=True)
             
             if not has_local:
                 st.info("현재 지정한 위치 주변에 매칭되는 소식이 없습니다.")
@@ -990,4 +990,4 @@ else:
                     title = item.get("title", "")
                     link = item.get("details", "")
                     card = generate_card_html(target, title, link)
-                    col.html(card)
+                    col.markdown(card, unsafe_allow_html=True)

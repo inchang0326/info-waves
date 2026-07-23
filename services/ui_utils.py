@@ -298,7 +298,7 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
         f'<div id="{card_id}" class="info-card">'
 
         # Clickable area: logo + brand + title → opens detail link in a new window
-        f'<a href="{href}" target="_blank" rel="noopener noreferrer" class="info-card-link">'
+        f'<a href="{href}" target="_blank" rel="noopener noreferrer" onclick="window.open(this.href, \'_blank\', \'noopener,noreferrer\'); return false;" class="info-card-link">'
 
         # Card header: logo + brand name
         f'<div class="info-card-header">'
@@ -340,7 +340,7 @@ def generate_mini_popup_html(brand: str, title: str, link: str) -> str:
         <div style="font-size: 13px; color: #4B5563; margin-bottom: 12px; line-height: 1.4; word-break: keep-all;">
             {escaped_title}
         </div>
-        <a href="{href}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: #2563EB; text-decoration: none; font-weight: 700;">자세히 보기</a>
+        <a href="{href}" target="_blank" rel="noopener noreferrer" onclick="window.open(this.href, '_blank', 'noopener,noreferrer'); return false;" style="font-size: 12px; color: #2563EB; text-decoration: none; font-weight: 700;">자세히 보기</a>
     </div>
     """
 
