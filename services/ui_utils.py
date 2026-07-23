@@ -430,6 +430,10 @@ def format_expander_title(category: str, count: int) -> str:
         clean_cat = "백화점/아울렛"
     elif clean_cat == "여가 및 쇼핑":
         clean_cat = "여가/쇼핑"
+    elif clean_cat == "영화관 및 문화/테마파크":
+        clean_cat = "영화관/문화"
+    elif clean_cat == "팝업스토어 & 전시/행사":
+        clean_cat = "팝업스토어"
         
     return f"{clean_cat} ({count}개)"
 

@@ -216,12 +216,14 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "신세계사이먼프리미엄아울렛", "title": "신세계사이먼 슈퍼세일 & 해외 명품 패밀리세일", "details": "https://www.premiumoutlets.co.kr", "category": "백화점 및 프리미엄 아울렛"},
             {"target": "현대프리미엄아울렛", "title": "현대아울렛 슈퍼위켄드 & 타임세일 파격 할인", "details": "https://www.ehyundai.com/newPortal/outlet/main.do", "category": "백화점 및 프리미엄 아울렛"},
             
-            # 의류 / 영화관
+            # 의류 / 영화관 / 테마파크
             {"target": "유니클로", "title": "유니클로 감사제 & 기간 한정 가격인하(세일)", "details": "https://www.uniqlo.com/kr/ko/", "category": "여가 및 쇼핑 혜택"},
             {"target": "탑텐", "title": "탑텐 텐텐데이 & 행복제 1+1 폭탄 세일", "details": "https://search.naver.com/search.naver?query=%ED%83%9F%ED%85%90", "category": "여가 및 쇼핑 혜택"},
-            {"target": "메가박스", "title": "메가박스 빵원티켓 & 오리지널 티켓 증정 이벤트", "details": "https://www.megabox.co.kr/event", "category": "여가 및 쇼핑 혜택"},
-            {"target": "CGV", "title": "CGV 스피드쿠폰 & IMAX 스페셜 포스터 굿즈 혜택", "details": "https://www.cgv.co.kr/culture-event/event/defaultNew.aspx", "category": "여가 및 쇼핑 혜택"},
-            {"target": "롯데시네마", "title": "롯데시네마 싸다구 예매 & 콤보 선착순 할인", "details": "https://www.lottecinema.co.kr/NLCHS/Event", "category": "여가 및 쇼핑 혜택"},
+            {"target": "메가박스", "title": "메가박스 빵원티켓 & 오리지널 티켓 증정 이벤트", "details": "https://www.megabox.co.kr/event", "category": "영화관 및 문화/테마파크"},
+            {"target": "CGV", "title": "CGV 스피드쿠폰 & IMAX 스페셜 포스터 굿즈 혜택", "details": "https://www.cgv.co.kr/culture-event/event/defaultNew.aspx", "category": "영화관 및 문화/테마파크"},
+            {"target": "롯데시네마", "title": "롯데시네마 싸다구 예매 & 콤보 선착순 할인", "details": "https://www.lottecinema.co.kr/NLCHS/Event", "category": "영화관 및 문화/테마파크"},
+            {"target": "롯데월드", "title": "통신사/카드사 50% 할인 & 이달의 생일/우대 혜택", "details": "https://adventure.lotteworld.com", "category": "영화관 및 문화/테마파크"},
+            {"target": "에버랜드", "title": "제휴카드 스마트예약 할인 & 이달의 프로모션", "details": "https://www.everland.com", "category": "영화관 및 문화/테마파크"},
             
             # 통신사 / 금융
             {"target": "SKT T데이", "title": "매주 수요일 SKT T Day 파격 멤버십 제휴 할인", "details": "https://sktmembership.tworld.co.kr", "category": "통신사 멤버십 혜택"},
@@ -274,9 +276,7 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "ABC마트", "title": "ABC마트 결산 세일 & 한가위/설날 파격 세일", "details": "https://abcmart.a-rt.com", "category": "여가 및 쇼핑 혜택"},
             {"target": "무신사스탠다드", "title": "오프라인 매장 전용 앱 쿠폰 & 무진장 세일", "details": "https://www.musinsa.com", "category": "여가 및 쇼핑 혜택"},
 
-            # 테마파크 / 모빌리티 / 주유
-            {"target": "롯데월드", "title": "통신사/카드사 50% 할인 & 이달의 생일/우대 혜택", "details": "https://adventure.lotteworld.com", "category": "여가 및 쇼핑 혜택"},
-            {"target": "에버랜드", "title": "제휴카드 스마트예약 할인 & 이달의 프로모션", "details": "https://www.everland.com", "category": "여가 및 쇼핑 혜택"},
+            # 모빌리티 / 주유
             {"target": "쏘카", "title": "내 주변 쏘카존 부름 무료 & 주말 대여료 폭탄 할인", "details": "https://www.socar.kr", "category": "여가 및 쇼핑 혜택"},
             {"target": "GS칼텍스", "title": "에너지플러스 앱 주유 3,000원 할인 & 세차권 쿠폰", "details": "https://www.gscaltex.com", "category": "여가 및 쇼핑 혜택"},
 
