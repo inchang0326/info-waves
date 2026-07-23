@@ -439,10 +439,12 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
     Returns custom Folium Icon parameters (color, icon, icon_color) based on brand and category.
     - 🎪 Pop-up Store & Exhibition: Pink Pin + Star Icon
     - 🏪 Convenience Store: Green Pin + Shopping-Cart Icon
-    - 🎬 Movie Theater & Culture: Purple Pin + Film Icon
+    - 🏢 Department Store & Outlet: Purple Pin + Home Icon
+    - 🎬 Movie Theater & Culture: Darkpurple Pin + Film Icon
+    - 💄 H&B Store (Olive Young / Daiso): Lightred Pin + Heart Icon
     - ☕ Cafe / Bakery / Dessert: Orange Pin + Coffee Icon
     - 🍔 Fast Food / Restaurant / Pizza / Chicken: Red Pin + Cutlery Icon
-    - 🛒 Mart / Department Store / Outlet: Darkblue Pin + Shopping-Bag Icon
+    - 🛒 Mart / SSM: Darkblue Pin + Shopping-Bag Icon
     - 🎁 Leisure & Shopping & Fashion: Cadetblue Pin + Tag Icon
     - 📍 Default: Blue Pin + Info-Sign Icon
     """
@@ -457,24 +459,32 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
     if "편의점" in c_lower or b_lower in ["cu", "gs25", "세븐일레븐", "이마트24", "씨유", "지에스25"]:
         return {"color": "green", "icon": "shopping-cart", "icon_color": "white"}
         
-    # 3. Movie Theater / Culture / Theme Park
-    if "영화" in c_lower or "극장" in c_lower or "cgv" in b_lower or "메가박스" in b_lower or "롯데시네마" in b_lower or "롯데월드" in b_lower or "에버랜드" in b_lower:
-        return {"color": "purple", "icon": "film", "icon_color": "white"}
+    # 3. Department Store & Premium Outlet
+    if "백화점" in c_lower or "아울렛" in c_lower or "백화점" in b_lower or "아울렛" in b_lower:
+        return {"color": "purple", "icon": "home", "icon_color": "white"}
 
-    # 4. Cafe & Bakery & Dessert
+    # 4. Movie Theater / Culture / Theme Park
+    if "영화" in c_lower or "극장" in c_lower or "cgv" in b_lower or "메가박스" in b_lower or "롯데시네마" in b_lower or "롯데월드" in b_lower or "에버랜드" in b_lower:
+        return {"color": "darkpurple", "icon": "film", "icon_color": "white"}
+
+    # 5. H&B Store (Olive Young / Daiso)
+    if "h&b" in c_lower or "올리브영" in b_lower or "다이소" in b_lower:
+        return {"color": "lightred", "icon": "heart", "icon_color": "white"}
+
+    # 6. Cafe & Bakery & Dessert
     if "카페" in c_lower or "커피" in c_lower or "베이커리" in c_lower or "디저트" in c_lower or "스타벅스" in b_lower or "투썸" in b_lower or "이디야" in b_lower or "메가커피" in b_lower or "컴포즈" in b_lower or "빽다방" in b_lower or "할리스" in b_lower or "던킨" in b_lower or "파리바게" in b_lower or "뚜레쥬르" in b_lower or "배스킨" in b_lower or "설빙" in b_lower or "폴바셋" in b_lower or "아티제" in b_lower or "더벤티" in b_lower or "요아정" in b_lower:
         return {"color": "orange", "icon": "coffee", "icon_color": "white"}
 
-    # 5. Fast Food / Restaurant / Pizza / Chicken / Food
+    # 7. Fast Food / Restaurant / Pizza / Chicken / Food
     if "외식" in c_lower or "패스트푸드" in c_lower or "치킨" in c_lower or "피자" in c_lower or "버거" in b_lower or "치킨" in b_lower or "피자" in b_lower or "떡볶이" in b_lower or "서브웨이" in b_lower or "써브웨이" in b_lower or "한솥" in b_lower or "본죽" in b_lower or "보쌈" in b_lower or "두끼" in b_lower or "홍콩반점" in b_lower:
         return {"color": "red", "icon": "cutlery", "icon_color": "white"}
 
-    # 6. Large Mart / SSM / Department Store / Outlet
-    if "마트" in c_lower or "백화점" in c_lower or "아울렛" in c_lower or "이마트" in b_lower or "홈플러스" in b_lower or "롯데마트" in b_lower or "코스트코" in b_lower or "트레이더스" in b_lower or "현대백화점" in b_lower or "신세계" in b_lower:
+    # 8. Large Mart / SSM
+    if "마트" in c_lower or "이마트" in b_lower or "홈플러스" in b_lower or "롯데마트" in b_lower or "코스트코" in b_lower or "트레이더스" in b_lower:
         return {"color": "darkblue", "icon": "shopping-bag", "icon_color": "white"}
 
-    # 7. Leisure & Shopping & Fashion & H&B
-    if "여가" in c_lower or "쇼핑" in c_lower or "h&b" in c_lower or "올리브영" in b_lower or "다이소" in b_lower or "스파오" in b_lower or "유니클로" in b_lower or "탑텐" in b_lower or "무신사" in b_lower or "abc" in b_lower or "쏘카" in b_lower or "주유" in c_lower or "칼텍스" in b_lower or "무인양품" in b_lower or "모던하우스" in b_lower or "아트박스" in b_lower:
+    # 9. Leisure & Shopping & Fashion
+    if "여가" in c_lower or "쇼핑" in c_lower or "스파오" in b_lower or "유니클로" in b_lower or "탑텐" in b_lower or "무신사" in b_lower or "abc" in b_lower or "쏘카" in b_lower or "주유" in c_lower or "칼텍스" in b_lower or "무인양품" in b_lower or "모던하우스" in b_lower or "아트박스" in b_lower:
         return {"color": "cadetblue", "icon": "tag", "icon_color": "white"}
 
     return {"color": "blue", "icon": "info-sign", "icon_color": "white"}
