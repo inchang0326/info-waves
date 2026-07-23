@@ -11,7 +11,7 @@ importlib.reload(services.location_service)
 from services.location_service import LocationService
 import services.ui_utils
 importlib.reload(services.ui_utils)
-from services.ui_utils import generate_card_html, generate_mini_popup_html, get_zoom_for_radius, format_expander_title, inject_global_clipboard_script, get_category_marker_icon
+from services.ui_utils import generate_card_html, generate_mini_popup_html, get_zoom_for_radius, format_expander_title, inject_global_clipboard_script, get_category_marker_icon, infer_category_from_brand
 from services.logger_utils import setup_logger
 import copy
 import logging
@@ -972,7 +972,8 @@ if curr_view == "내 주변 맞춤 혜택":
             if all_local_items:
                 cat_to_items = {}
                 for item in all_local_items:
-                    c = item.get("orig_category") or "기타"
+                    b = item.get("brand") or item.get("target")
+                    c = infer_category_from_brand(b, item.get("orig_category", ""))
                     if c not in cat_to_items: cat_to_items[c] = []
                     cat_to_items[c].append(item)
                     

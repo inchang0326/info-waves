@@ -438,22 +438,44 @@ def format_expander_title(category: str, count: int) -> str:
     return f"{clean_cat} ({count}개)"
 
 
+def infer_category_from_brand(brand: str, category: str = "") -> str:
+    """
+    Infers the correct category from the brand name if category is missing, empty, or '기타'.
+    Prevents any brand from collapsing into '기타' or unclassified fallback icons.
+    """
+    if category and category not in ["기타", "내 주변 매장 혜택", "알 수 없음", ""]:
+        return category
+        
+    b = str(brand or "").lower()
+    if "팝업" in b or "팝플리" in b or "팝가" in b or "헤이팝" in b or "더현대" in b:
+        return "팝업스토어 & 전시/행사"
+    elif b in ["cu", "gs25", "세븐일레븐", "이마트24", "씨유", "지에스25"]:
+        return "편의점 혜택"
+    elif "영화" in b or "cgv" in b or "메가박스" in b or "롯데시네마" in b or "롯데월드" in b or "에버랜드" in b:
+        return "영화관 및 문화/테마파크"
+    elif "올리브영" in b or "다이소" in b or "h&b" in b:
+        return "H&B 스토어"
+    elif "백화점" in b or "아울렛" in b or "신세계" in b:
+        return "백화점 및 프리미엄 아울렛"
+    elif "마트" in b or "이마트" in b or "홈플러스" in b or "코스트코" in b or "트레이더스" in b:
+        return "대형마트 통합"
+    elif "카페" in b or "커피" in b or "베이커리" in b or "스타벅스" in b or "투썸" in b or "이디야" in b or "메가커피" in b or "컴포즈" in b or "빽다방" in b or "할리스" in b or "던킨" in b or "파리바게" in b or "뚜레쥬르" in b or "배스킨" in b or "설빙" in b or "폴바셋" in b:
+        return "카페 및 베이커리/디저트"
+    elif "버거" in b or "치킨" in b or "피자" in b or "떡볶이" in b or "서브웨이" in b or "써브웨이" in b or "한솥" in b or "본죽" in b or "보쌈" in b or "두끼" in b or "홍콩반점" in b:
+        return "외식/패스트푸드 및 피자/치킨"
+    elif "스파오" in b or "유니클로" in b or "탑텐" in b or "무신사" in b or "abc" in b or "쏘카" in b or "주유" in b or "칼텍스" in b:
+        return "여가 및 쇼핑 혜택"
+    else:
+        return category or "기타"
+
+
 def get_category_marker_icon(brand: str, category: str = "") -> dict:
     """
     Returns custom Folium Icon parameters (color, icon, icon_color, prefix) based on brand and category.
-    - 🎪 Pop-up Store & Exhibition: Pink Pin + Star Icon (prefix='fa')
-    - 🏪 Convenience Store: Green Pin + Shopping-Cart Icon (prefix='fa')
-    - 🏢 Department Store & Outlet: Purple Pin + Building Icon (prefix='fa')
-    - 🎬 Movie Theater & Culture: Darkpurple Pin + Film Icon (prefix='fa')
-    - 💄 H&B Store (Olive Young / Daiso): Lightred Pin + Heart Icon (prefix='fa')
-    - ☕ Cafe / Bakery / Dessert: Orange Pin + Coffee Icon (prefix='fa')
-    - 🍔 Fast Food / Restaurant / Pizza / Chicken: Red Pin + Cutlery Icon (prefix='fa')
-    - 🛒 Mart / SSM: Darkblue Pin + Shopping-Bag Icon (prefix='fa')
-    - 🎁 Leisure & Shopping & Fashion: Cadetblue Pin + Tag Icon (prefix='fa')
-    - 📍 Default: Blue Pin + Info-Circle Icon (prefix='fa')
     """
+    effective_cat = infer_category_from_brand(brand, category)
     b_lower = str(brand or "").lower()
-    c_lower = str(category or "").lower()
+    c_lower = str(effective_cat or "").lower()
     
     # 1. Pop-up Store & Exhibition / Event
     if "팝업" in b_lower or "팝업" in c_lower or "전시" in c_lower or "팝플리" in b_lower or "팝가" in b_lower or "헤이팝" in b_lower or ("더현대" in b_lower and "아울렛" not in b_lower):
