@@ -16,7 +16,7 @@ def fetch_global_alerts() -> dict:
     return _run_scrapers(scrapers)
 import streamlit as st
 
-@st.cache_data(ttl=300, show_spinner=False)
+@st.cache_data(ttl=60, show_spinner=False)
 def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km: float = 3.0) -> dict:
     lat = round(float(lat), 5)
     lon = round(float(lon), 5)
@@ -25,76 +25,64 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
     location_service = LocationService()
     neighborhood = location_service.get_neighborhood(lat, lon)
     
-    local_mapped_results = []
+    local_categorized_results = {
+        "편의점 혜택": [],
+        "카페 및 베이커리/디저트": [],
+        "H&B 스토어": [],
+        "외식/패스트푸드 및 피자/치킨": [],
+        "대형마트 통합": [],
+        "백화점 및 프리미엄 아울렛": [],
+        "여가 및 쇼핑 혜택": [],
+        "영화관 및 문화/테마파크": [],
+        "팝업스토어 & 전시/행사": []
+    }
     
-    # Extract only the keys relevant to offline locations
-    offline_categories = [
-        "편의점 혜택", "카페 및 베이커리/디저트", "H&B 스토어", 
-        "외식/패스트푸드 및 피자/치킨", "대형마트 통합", 
-        "여가 및 쇼핑 혜택", "백화점 및 프리미엄 아울렛",
-        "영화관 및 문화/테마파크",
-        "팝업스토어 & 전시/행사"
-    ]
+    all_local_items = []
     
-    def _process_item(item):
-        brand = item.get("target")
-        if not brand: return []
-        places = location_service.search_nearby_brand(lat, lon, neighborhood, brand, max_distance_km=radius_km)
-        res = []
-        for p in places:
-            res.append({
-                "brand": brand,
-                "target": p["name"],
-                "title": item.get('title'),
-                "details": item.get("details"),
-                "category": "내 주변 매장 혜택",
-                "orig_category": item.get("category", ""),
-                "address": p["address"],
-                "road_address": p.get("road_address", ""),
-                "lat": p.get("lat"),
-                "lon": p.get("lon")
-            })
-        return res
+    for cat in list(local_categorized_results.keys()):
+        items_in_cat = _global_results.get(cat, [])
+        if not items_in_cat: continue
+        
+        unique_brands = list(set(item.get("target") for item in items_in_cat if item.get("target")))
+        
+        brand_to_places = {}
+        def _fetch_brand(b):
+            return b, location_service.search_nearby_brand(lat, lon, neighborhood, b, max_distance_km=radius_km)
 
-    items_to_process = []
-    for cat in offline_categories:
-        if cat in _global_results:
-            items_to_process.extend(_global_results[cat])
+        with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
+            futures = [executor.submit(_fetch_brand, b) for b in unique_brands]
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    b, places = future.result()
+                    brand_to_places[b] = places
+                except Exception as e:
+                    logger.exception(f"주변 매장 검색 중 오류 발생: {e}")
 
-    unique_brands = list(set(item.get("target") for item in items_to_process if item.get("target")))
+        for item in items_in_cat:
+            brand = item.get("target")
+            if not brand: continue
+            places = brand_to_places.get(brand, [])
+            for p in places:
+                mapped_item = {
+                    "brand": brand,
+                    "target": p["name"],
+                    "title": item.get('title'),
+                    "details": item.get("details"),
+                    "category": cat,
+                    "orig_category": cat,
+                    "address": p["address"],
+                    "road_address": p.get("road_address", ""),
+                    "lat": p.get("lat"),
+                    "lon": p.get("lon")
+                }
+                local_categorized_results[cat].append(mapped_item)
+                
+                local_item = dict(mapped_item)
+                local_item["category"] = "내 주변 매장 혜택"
+                all_local_items.append(local_item)
 
-    brand_to_places = {}
-    def _fetch_brand(b):
-        return b, location_service.search_nearby_brand(lat, lon, neighborhood, b, max_distance_km=radius_km)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
-        futures = [executor.submit(_fetch_brand, b) for b in unique_brands]
-        for future in concurrent.futures.as_completed(futures):
-            try:
-                b, places = future.result()
-                brand_to_places[b] = places
-            except Exception as e:
-                logger.exception(f"주변 매장 검색 중 오류 발생: {e}")
-
-    for item in items_to_process:
-        brand = item.get("target")
-        if not brand: continue
-        places = brand_to_places.get(brand, [])
-        for p in places:
-            local_mapped_results.append({
-                "brand": brand,
-                "target": p["name"],
-                "title": item.get('title'),
-                "details": item.get("details"),
-                "category": "내 주변 매장 혜택",
-                "orig_category": item.get("category", ""),
-                "address": p["address"],
-                "road_address": p.get("road_address", ""),
-                "lat": p.get("lat"),
-                "lon": p.get("lon")
-            })
-
-    return {"내 주변 매장 혜택": local_mapped_results}
+    local_categorized_results["내 주변 매장 혜택"] = all_local_items
+    return local_categorized_results
 def _run_scrapers(scrapers) -> dict:
     categorized_results = {
         "통신사 멤버십 혜택": [],

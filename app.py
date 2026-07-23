@@ -833,7 +833,7 @@ if curr_view == "내 주변 맞춤 혜택":
         if "local_results" in st.session_state:
             local_results = st.session_state["local_results"]
             for category, items in local_results.items():
-                if not items: continue
+                if not items or category == "내 주변 매장 혜택": continue
                 grouped_items = {}
                 for item in items:
                     key = (item.get("brand", "알 수 없음"), item.get("title", ""), item.get("details", ""))
@@ -965,33 +965,24 @@ if curr_view == "내 주변 맞춤 혜택":
         st.markdown("#### 🎯 내 주변 혜택 목록")
         if "local_results" in st.session_state:
             local_results = st.session_state["local_results"]
-            all_local_items = []
-            for items in local_results.values():
-                all_local_items.extend(items)
+            has_local = False
+            for cat, items in local_results.items():
+                if not items or cat == "내 주변 매장 혜택": continue
+                has_local = True
                 
-            if all_local_items:
-                cat_to_items = {}
-                for item in all_local_items:
-                    b = item.get("brand") or item.get("target")
-                    c = infer_category_from_brand(b, item.get("orig_category", ""))
-                    if c not in cat_to_items: cat_to_items[c] = []
-                    cat_to_items[c].append(item)
+                grouped_items = {}
+                for item in items:
+                    key = (item.get("brand", "알 수 없음"), item.get("title", ""), item.get("details", ""))
+                    if key not in grouped_items: grouped_items[key] = []
+                    grouped_items[key].append(item)
                     
-                # Display category expanders
-                for cat, items in cat_to_items.items():
-                    if not items: continue
-                    grouped_items = {}
-                    for item in items:
-                        key = (item.get("brand", "알 수 없음"), item.get("title", ""), item.get("details", ""))
-                        if key not in grouped_items: grouped_items[key] = []
-                        grouped_items[key].append(item)
+                is_expanded = any(k in cat for k in ["팝업", "외식", "편의점"])
+                with st.expander(format_expander_title(cat, len(grouped_items)), expanded=is_expanded):
+                    for (brand, title, link), branch_items in grouped_items.items():
+                        card = generate_card_html(brand, title, link, branch_items)
+                        st.markdown(card, unsafe_allow_html=True)
                         
-                    is_expanded = any(k in cat for k in ["팝업", "외식", "편의점"])
-                    with st.expander(format_expander_title(cat, len(grouped_items)), expanded=is_expanded):
-                        for (brand, title, link), branch_items in grouped_items.items():
-                            card = generate_card_html(brand, title, link, branch_items)
-                            st.markdown(card, unsafe_allow_html=True)
-            else:
+            if not has_local:
                 st.info("현재 지정한 위치 주변에 매칭되는 소식이 없습니다.")
         else:
             st.info("지도 하단에서 탐색 반경을 조절한 후 '탐색' 버튼을 눌러주세요.")
