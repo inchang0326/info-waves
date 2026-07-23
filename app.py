@@ -804,6 +804,9 @@ if curr_view == "내 주변 맞춤 혜택":
             **{"doubleClickZoom": False}
         )
         
+        # Add FontAwesome 4.7.0 stylesheet CDN for crisp marker icon rendering
+        m.get_root().html.add_child(folium.Element('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'))
+        
         # Add basic elements directly to the map
         folium.CircleMarker(
             location=[lat_input, lon_input],
@@ -849,7 +852,12 @@ if curr_view == "내 주변 맞춤 혜택":
                                 location=[b_lat, b_lon],
                                 popup=popup,
                                 tooltip=f"[{brand}] {branch.get('target', brand)}",
-                                icon=folium.Icon(color=icon_style["color"], icon=icon_style["icon"], icon_color=icon_style.get("icon_color", "white"))
+                                icon=folium.Icon(
+                                    color=icon_style["color"],
+                                    icon=icon_style["icon"],
+                                    icon_color=icon_style.get("icon_color", "white"),
+                                    prefix=icon_style.get("prefix", "fa")
+                                )
                             ).add_to(m)
 
         # 1. KakaoMap Clone: Top Search Bar (Floated over top of map)
@@ -957,22 +965,32 @@ if curr_view == "내 주변 맞춤 혜택":
         st.markdown("#### 🎯 내 주변 혜택 목록")
         if "local_results" in st.session_state:
             local_results = st.session_state["local_results"]
-            has_local = False
-            for category, items in local_results.items():
-                if not items: continue
-                has_local = True
+            all_local_items = []
+            for items in local_results.values():
+                all_local_items.extend(items)
                 
-                grouped_items = {}
-                for item in items:
-                    key = (item.get("brand", "알 수 없음"), item.get("title", ""), item.get("details", ""))
-                    if key not in grouped_items: grouped_items[key] = []
-                    grouped_items[key].append(item)
+            if all_local_items:
+                cat_to_items = {}
+                for item in all_local_items:
+                    c = item.get("orig_category") or "기타"
+                    if c not in cat_to_items: cat_to_items[c] = []
+                    cat_to_items[c].append(item)
                     
-                for (brand, title, link), branch_items in grouped_items.items():
-                    card = generate_card_html(brand, title, link, branch_items)
-                    st.markdown(card, unsafe_allow_html=True)
-            
-            if not has_local:
+                # Display category expanders
+                for cat, items in cat_to_items.items():
+                    if not items: continue
+                    grouped_items = {}
+                    for item in items:
+                        key = (item.get("brand", "알 수 없음"), item.get("title", ""), item.get("details", ""))
+                        if key not in grouped_items: grouped_items[key] = []
+                        grouped_items[key].append(item)
+                        
+                    is_expanded = any(k in cat for k in ["팝업", "외식", "편의점"])
+                    with st.expander(format_expander_title(cat, len(grouped_items)), expanded=is_expanded):
+                        for (brand, title, link), branch_items in grouped_items.items():
+                            card = generate_card_html(brand, title, link, branch_items)
+                            st.markdown(card, unsafe_allow_html=True)
+            else:
                 st.info("현재 지정한 위치 주변에 매칭되는 소식이 없습니다.")
         else:
             st.info("지도 하단에서 탐색 반경을 조절한 후 '탐색' 버튼을 눌러주세요.")
