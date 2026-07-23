@@ -31,7 +31,8 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
     offline_categories = [
         "편의점 혜택", "카페 및 베이커리/디저트", "H&B 스토어", 
         "외식/패스트푸드 및 피자/치킨", "대형마트 통합", 
-        "여가 및 쇼핑 혜택", "백화점 및 프리미엄 아울렛"
+        "여가 및 쇼핑 혜택", "백화점 및 프리미엄 아울렛",
+        "팝업스토어 & 전시/행사"
     ]
     
     def _process_item(item):
@@ -46,6 +47,7 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
                 "title": item.get('title'),
                 "details": item.get("details"),
                 "category": "내 주변 매장 혜택",
+                "orig_category": item.get("category", ""),
                 "address": p["address"],
                 "road_address": p.get("road_address", ""),
                 "lat": p.get("lat"),
@@ -84,6 +86,7 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
                 "title": item.get('title'),
                 "details": item.get("details"),
                 "category": "내 주변 매장 혜택",
+                "orig_category": item.get("category", ""),
                 "address": p["address"],
                 "road_address": p.get("road_address", ""),
                 "lat": p.get("lat"),
@@ -105,8 +108,7 @@ def _run_scrapers(scrapers) -> dict:
         "여가 및 쇼핑 혜택": [],
         "여행 및 숙박": [],
         "핫딜 커뮤니티": [],
-        "대형마트 새소식(동네)": [],
-        "팝업스토어(동네)": [],
+        "팝업스토어 & 전시/행사": [],
         "기타": []
     }
     

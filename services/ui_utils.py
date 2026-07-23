@@ -128,6 +128,13 @@ def get_brand_logo(brand_name: str) -> str:
         "에버랜드": "https://www.google.com/s2/favicons?domain=everland.com&sz=128",
         "쏘카": "https://www.google.com/s2/favicons?domain=socar.kr&sz=128",
         "GS칼텍스": "https://www.google.com/s2/favicons?domain=gscaltex.com&sz=128",
+
+        # 팝업스토어 & 전시/행사
+        "팝플리": "https://www.google.com/s2/favicons?domain=popply.co.kr&sz=128",
+        "팝가": "https://www.google.com/s2/favicons?domain=popga.co.kr&sz=128",
+        "더현대": "https://www.google.com/s2/favicons?domain=ehyundai.com&sz=128",
+        "롯데월드몰": "https://www.google.com/s2/favicons?domain=lotteshopping.com&sz=128",
+        "헤이팝": "https://www.google.com/s2/favicons?domain=heypop.kr&sz=128",
     }
 
     for key, logo_url in official_logos.items():
@@ -425,3 +432,33 @@ def format_expander_title(category: str, count: int) -> str:
         clean_cat = "여가/쇼핑"
         
     return f"{clean_cat} ({count}개)"
+
+
+def get_category_marker_icon(brand: str, category: str = "") -> dict:
+    """
+    Returns custom Folium Icon parameters (color, icon, icon_color) based on brand and category.
+    - 🎪 Pop-up Store & Exhibition: Pink Pin + Star Icon
+    - 🏪 Convenience Store: Green Pin + Shopping-Cart Icon
+    - ☕ Cafe / Bakery / Dessert: Orange Pin + Coffee Icon
+    - 🍔 Fast Food / Restaurant / Pizza / Chicken: Red Pin + Cutlery Icon
+    - 🛒 Mart / Department Store / Outlet: Purple Pin + Shopping-Bag Icon
+    - 🎁 Leisure & Shopping: Cadetblue Pin + Tag Icon
+    - 📍 Default: Blue Pin + Info-Sign Icon
+    """
+    b_lower = str(brand or "").lower()
+    c_lower = str(category or "").lower()
+    
+    if "팝업" in b_lower or "팝업" in c_lower or "전시" in c_lower or "팝플리" in b_lower or "팝가" in b_lower or "헤이팝" in b_lower or "더현대" in b_lower:
+        return {"color": "pink", "icon": "star", "icon_color": "white"}
+    elif "편의점" in c_lower or b_lower in ["cu", "gs25", "세븐일레븐", "이마트24", "씨유"]:
+        return {"color": "green", "icon": "shopping-cart", "icon_color": "white"}
+    elif "카페" in c_lower or "커피" in b_lower or "디저트" in c_lower or "스타벅스" in b_lower or "투썸" in b_lower or "이디야" in b_lower or "메가" in b_lower or "컴포즈" in b_lower:
+        return {"color": "orange", "icon": "coffee", "icon_color": "white"}
+    elif "외식" in c_lower or "패스트푸드" in c_lower or "버거" in b_lower or "치킨" in b_lower or "피자" in b_lower or "떡볶이" in b_lower or "썹프라이즈" in b_lower:
+        return {"color": "red", "icon": "cutlery", "icon_color": "white"}
+    elif "마트" in c_lower or "백화점" in c_lower or "아울렛" in c_lower or "이마트" in b_lower or "홈플러스" in b_lower or "롯데마트" in b_lower or "코스트코" in b_lower:
+        return {"color": "purple", "icon": "shopping-bag", "icon_color": "white"}
+    elif "여가" in c_lower or "쇼핑" in c_lower or "올리브영" in b_lower or "다이소" in b_lower or "스파오" in b_lower or "abc" in b_lower:
+        return {"color": "cadetblue", "icon": "tag", "icon_color": "white"}
+    else:
+        return {"color": "blue", "icon": "info-sign", "icon_color": "white"}

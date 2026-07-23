@@ -284,7 +284,14 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "뽐뿌", "title": "뽐뿌 핫딜 게시판 최신 실시간 인기 핫딜", "details": "https://www.ppomppu.co.kr/zboard/zboard.php?id=ppomppu", "category": "핫딜 커뮤니티"},
             {"target": "퀘이사존", "title": "퀘이사존 지름/알뜰정보 실시간 핫딜", "details": "https://quasarzone.com/bbs/qb_saleinfo", "category": "핫딜 커뮤니티"},
             {"target": "어미새", "title": "패션 및 오프라인 쇼핑 실시간 핫딜 정보", "details": "https://eomisae.co.kr", "category": "핫딜 커뮤니티"},
-            {"target": "쿨엔조이", "title": "쿨엔조이 알뜰구매 게시판 최신 핫딜", "details": "https://coolenjoy.net/bbs/jirum", "category": "핫딜 커뮤니티"}
+            {"target": "쿨엔조이", "title": "쿨엔조이 알뜰구매 게시판 최신 핫딜", "details": "https://coolenjoy.net/bbs/jirum", "category": "핫딜 커뮤니티"},
+
+            # 팝업스토어 & 전시/행사
+            {"target": "팝플리 (POPPLY)", "title": "성수/홍대/더현대 실시간 팝업스토어 지도 & 일정", "details": "https://popply.co.kr", "category": "팝업스토어 & 전시/행사"},
+            {"target": "팝가 (POPGA)", "title": "성수동 연무장길 팝업스토어 & 맛집 제휴 혜택", "details": "https://popga.co.kr", "category": "팝업스토어 & 전시/행사"},
+            {"target": "더현대 서울 팝업", "title": "더현대 서울 지하 1층 & Sounds Forest 팝업스토어 현황", "details": "https://www.ehyundai.com", "category": "팝업스토어 & 전시/행사"},
+            {"target": "롯데월드몰 팝업", "title": "잠실 롯데월드몰 1층 아트리움 대형 팝업스토어", "details": "https://www.lotteshopping.com", "category": "팝업스토어 & 전시/행사"},
+            {"target": "헤이팝 (heyPOP)", "title": "트렌디 브랜드 & 라이프스타일 팝업스토어 소식", "details": "https://heypop.kr", "category": "팝업스토어 & 전시/행사"}
         ]
         
         # 동시성(Thread)을 이용해 50개 업체의 최신 뉴스를 1~2초만에 긁어와 병합

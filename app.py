@@ -11,7 +11,7 @@ importlib.reload(services.location_service)
 from services.location_service import LocationService
 import services.ui_utils
 importlib.reload(services.ui_utils)
-from services.ui_utils import generate_card_html, generate_mini_popup_html, get_zoom_for_radius, format_expander_title, inject_global_clipboard_script
+from services.ui_utils import generate_card_html, generate_mini_popup_html, get_zoom_for_radius, format_expander_title, inject_global_clipboard_script, get_category_marker_icon
 from services.logger_utils import setup_logger
 import copy
 import logging
@@ -844,11 +844,12 @@ if curr_view == "내 주변 맞춤 혜택":
                         if b_lat and b_lon:
                             popup_html = generate_mini_popup_html(brand, title, link)
                             popup = folium.Popup(folium.Html(popup_html, script=True), max_width=320)
+                            icon_style = get_category_marker_icon(brand, branch.get("orig_category") or category)
                             folium.Marker(
                                 location=[b_lat, b_lon],
                                 popup=popup,
-                                tooltip=branch.get("target"),
-                                icon=folium.Icon(color="blue", icon="info-sign")
+                                tooltip=f"[{brand}] {branch.get('target', brand)}",
+                                icon=folium.Icon(color=icon_style["color"], icon=icon_style["icon"], icon_color=icon_style.get("icon_color", "white"))
                             ).add_to(m)
 
         # 1. KakaoMap Clone: Top Search Bar (Floated over top of map)
