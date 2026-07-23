@@ -1,4 +1,5 @@
 import requests
+import urllib.parse
 from bs4 import BeautifulSoup
 from typing import List, Dict
 from playwright.sync_api import sync_playwright
@@ -134,14 +135,15 @@ class HybridOfficialScraper(AbstractScraper):
         
     def _fetch_news_headline(self, brand: str) -> str:
         try:
-            url = f"https://news.google.com/rss/search?q={brand}+이벤트+when:30d&hl=ko&gl=KR&ceid=KR:ko"
+            encoded_brand = urllib.parse.quote(brand)
+            url = f"https://news.google.com/rss/search?q={encoded_brand}+이벤트+when:30d&hl=ko&gl=KR&ceid=KR:ko"
             resp = requests.get(url, timeout=3)
             if resp.status_code == 200:
-                soup = BeautifulSoup(resp.text, 'xml')
+                soup = BeautifulSoup(resp.text, 'html.parser')
                 items = soup.find_all('item')
                 for item in items:
                     title = item.title.text.split(" - ")[0].strip()
-                    # 필터링: 브랜드명이 포함된 기사를 선호하고 너무 뻔한 제목 배제
+                    # 필터링: 브랜드명이 포함되거나 이벤트/할인/세일 관련 기사 (최근 1개월)
                     if brand in title or "이벤트" in title or "할인" in title or "프로모션" in title or "세일" in title:
                         return f" & [신규] {title}"
         except Exception:

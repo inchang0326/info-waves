@@ -91,6 +91,7 @@ def get_brand_logo(brand_name: str) -> str:
 
         # 추가 브랜드 로고
         "서브웨이": "https://www.google.com/s2/favicons?domain=subway.co.kr&sz=128",
+        "써브웨이": "https://www.google.com/s2/favicons?domain=subway.co.kr&sz=128",
         "노브랜드": "https://www.google.com/s2/favicons?domain=nobrandburger.com&sz=128",
         "프랭크버거": "https://www.google.com/s2/favicons?domain=frankburger.co.kr&sz=128",
         "60계치킨": "https://www.google.com/s2/favicons?domain=60chicken.co.kr&sz=128",

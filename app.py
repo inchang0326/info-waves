@@ -702,7 +702,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=60)
 def get_global_data():
     try:
         return fetch_global_alerts()
