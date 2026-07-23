@@ -126,14 +126,29 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
         return cached_res
     queries = []
     if neighborhood:
-        queries.append(f"{neighborhood} {brand}")
-        base_dong = re.sub(r"\d+동$", "동", neighborhood)
-        if base_dong and base_dong != neighborhood:
-            queries.append(f"{base_dong} {brand}")
-        short_name = re.sub(r"동$", "", base_dong)
-        if short_name and short_name != base_dong:
-            queries.append(f"{short_name} {brand}")
-    queries.append(brand)
+        queries = [f"{neighborhood} {brand}"]
+    base_dong = re.sub(r"\d+동$", "동", neighborhood)
+    if base_dong and base_dong != neighborhood:
+        queries.append(f"{base_dong} {brand}")
+    short_name = re.sub(r"동$", "", base_dong)
+    if short_name and short_name != base_dong:
+        queries.append(f"{short_name} {brand}")
+    
+    # Clean Query Custom Mappings for Pop-up Stores & Special Brands
+    if "더현대" in brand:
+        queries.extend(["더현대 서울", "여의도 더현대"])
+    elif "롯데월드몰" in brand:
+        queries.extend(["롯데월드몰", "잠실 롯데월드타워"])
+    elif "팝가" in brand:
+        queries.extend(["성수동 연무장길", "성수 팝업스토어"])
+    elif "팝플리" in brand:
+        queries.extend(["성수동 팝업스토어", "홍대 팝업스토어", "성수 팝업"])
+    elif "헤이팝" in brand:
+        queries.extend(["강남 팝업스토어", "신사동 팝업스토어", "한남동 팝업"])
+    elif "팝업" in brand:
+        queries.extend(["팝업스토어", f"{short_name} 팝업"])
+    else:
+        queries.append(brand)
 
     headers = {
         'Referer': 'https://map.kakao.com/',
@@ -240,10 +255,15 @@ class LocationService:
         lat_r = round(lat, 3)
         lon_r = round(lon, 3)
         places = _cached_search_nearby_brand(neighborhood, brand, lat_r, lon_r)
+        
+        effective_max_dist = max_distance_km
+        if any(k in brand for k in ["팝업", "팝플리", "팝가", "헤이팝", "더현대", "롯데월드몰"]):
+            effective_max_dist = max(max_distance_km, 35.0)
+
         filtered = []
         for p in places:
             dist = self._calculate_distance(lat, lon, p["lat"], p["lon"])
-            if dist <= max_distance_km:
+            if dist <= effective_max_dist:
                 p_copy = dict(p)
                 p_copy["distance_km"] = dist
                 filtered.append(p_copy)
