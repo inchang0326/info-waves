@@ -766,7 +766,6 @@ def handle_search():
             
             radius_km_val = st.session_state.get("radius_val", 3.0)
             try:
-                st.cache_data.clear()
                 st.session_state["local_results"] = fetch_local_alerts(s_lat, s_lon, global_results, radius_km_val)
                 st.session_state["_local_results_ver"] = st.session_state.get("_local_results_ver", 0) + 1
             except Exception as e:

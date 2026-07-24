@@ -192,7 +192,9 @@ def get_brand_logo(brand_name: str) -> str:
                 f'<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="{font_color}" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="42">{text}</text>'
                 f'</svg>'
             )
-            return f"data:image/svg+xml;utf8,{urllib.parse.quote(svg)}"
+            import base64
+            b64_svg = base64.b64encode(svg.encode("utf-8")).decode("utf-8")
+            return f"data:image/svg+xml;base64,{b64_svg}"
 
     # Tier 3: Automatic English / Alphanumeric Domain Inference
     import re
@@ -215,7 +217,9 @@ def get_brand_logo(brand_name: str) -> str:
         f'<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" font-size="44">{display_text}</text>'
         '</svg>'
     )
-    return f"data:image/svg+xml;utf8,{urllib.parse.quote(svg_badge)}"
+    import base64
+    b64_badge = base64.b64encode(svg_badge.encode("utf-8")).decode("utf-8")
+    return f"data:image/svg+xml;base64,{b64_badge}"
 
 def inject_global_clipboard_script():
     import streamlit.components.v1 as components
