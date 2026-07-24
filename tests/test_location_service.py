@@ -14,11 +14,11 @@ def test_haversine_distance_calculation():
     assert 17.0 <= sanbon_to_yeouido <= 19.0
 
 def test_get_neighborhood_fallback_on_exception():
-    """역지오코딩 API 예외 발생 시 시스템 기본값('여의도동')으로 안전하게 Fallback 되는지 검증합니다."""
+    """역지오코딩 API 예외 발생 시 다른 지역(여의도동 등)으로 오염되지 않고 안전하게 빈 문자열('')로 Fallback 되는지 검증합니다."""
     with patch("services.location_service._session.get") as mock_get:
         mock_get.side_effect = Exception("OpenStreetMap Network Timeout Error")
         result = _cached_get_neighborhood(0.001, 0.001)
-        assert result == "여의도동"
+        assert result == ""
 
 def test_search_nearby_brand_filtering():
     """
@@ -132,5 +132,26 @@ def test_popup_store_strict_geofencing():
         filtered = service.search_nearby_brand(37.3602, 126.9204, "산본동", "팝업스토어", max_distance_km=3.0)
         assert len(filtered) == 1
         assert filtered[0]["name"] == "팝업 롯데피트인 산본점"
+
+def test_sanbon_gosanro_full_store_detection():
+    """산본 '고산로 517번길 20' 반경 3km 탐색 시 버거킹, 롯데리아, 맘스터치, 맥도날드 등 주요 브랜드 매장이 누락 없이 탐색되는지 통합 검증합니다."""
+    service = LocationService()
+    lat, lon = 37.36023163, 126.92042895
+    neighborhood = "산본동"
+    
+    # 1. 버거킹 산본역점/산본점 탐색 검증
+    bk_stores = service.search_nearby_brand(lat, lon, neighborhood, "버거킹", max_distance_km=3.0)
+    assert len(bk_stores) >= 1
+    assert any("산본" in s["name"] for s in bk_stores)
+
+    # 2. 롯데리아 산본점 탐색 검증
+    lt_stores = service.search_nearby_brand(lat, lon, neighborhood, "롯데리아", max_distance_km=3.0)
+    assert len(lt_stores) >= 1
+    assert any("산본" in s["name"] for s in lt_stores)
+
+    # 3. 맘스터치 산본점 탐색 검증
+    mt_stores = service.search_nearby_brand(lat, lon, neighborhood, "맘스터치", max_distance_km=3.0)
+    assert len(mt_stores) >= 1
+    assert any("산본" in s["name"] for s in mt_stores)
 
 
