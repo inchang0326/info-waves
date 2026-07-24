@@ -1,3 +1,4 @@
+import urllib.parse
 import concurrent.futures
 from services.location_service import LocationService
 from services.scraper_service import (
@@ -90,16 +91,19 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
                         continue
                     seen_popup_coords.add(coord_key)
                     actual_brand = p["name"]
-                    actual_title = f"{p['name']} 실시간 팝업스토어 소식 ({p.get('address', '')})"
+                    actual_title = f"[{p['name']}] {p.get('address', '')} - 실시간 팝업스토어 & 브랜드 행사진행 현황 (네이버 지도 실시간 상세보기)"
+                    query_encoded = urllib.parse.quote(f"{p['name']} 팝업스토어")
+                    actual_details = f"https://m.map.naver.com/search2/search.naver?query={query_encoded}"
                 else:
                     actual_brand = brand
                     actual_title = item.get("title")
+                    actual_details = item.get("details")
 
                 mapped_item = {
                     "brand": actual_brand,
                     "target": p["name"],
                     "title": actual_title,
-                    "details": item.get("details"),
+                    "details": actual_details,
                     "category": cat,
                     "orig_category": cat,
                     "address": p["address"],
