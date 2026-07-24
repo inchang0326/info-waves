@@ -58,15 +58,27 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
                 except Exception as e:
                     logger.exception(f"주변 매장 검색 중 오류 발생: {e}")
 
+        seen_popup_coords = set()
         for item in items_in_cat:
             brand = item.get("target")
             if not brand: continue
             places = brand_to_places.get(brand, [])
             for p in places:
+                if cat == "팝업스토어 & 전시/행사":
+                    coord_key = (round(p["lat"], 4), round(p["lon"], 4), p["name"])
+                    if coord_key in seen_popup_coords:
+                        continue
+                    seen_popup_coords.add(coord_key)
+                    actual_brand = p["name"]
+                    actual_title = f"{p['name']} 실시간 팝업스토어 소식 ({p.get('address', '')})"
+                else:
+                    actual_brand = brand
+                    actual_title = item.get("title")
+
                 mapped_item = {
-                    "brand": brand,
+                    "brand": actual_brand,
                     "target": p["name"],
-                    "title": item.get('title'),
+                    "title": actual_title,
                     "details": item.get("details"),
                     "category": cat,
                     "orig_category": cat,
