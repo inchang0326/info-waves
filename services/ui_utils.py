@@ -166,6 +166,22 @@ def get_brand_logo(brand_name: str) -> str:
         "메가박스": ("MB", "#312e81", "#ffffff"),
         "Megabox": ("MB", "#312e81", "#ffffff"),
         "엔제리너스": ("ANG", "#b45309", "#ffffff"),
+        "할리스": ("HL", "#ba1b22", "#ffffff"),
+        "Hollys": ("HL", "#ba1b22", "#ffffff"),
+        "천년닭강정": ("천년", "#ea580c", "#ffffff"),
+        "60계치킨": ("60계", "#d97706", "#ffffff"),
+        "60계": ("60계", "#d97706", "#ffffff"),
+        "동대문엽기떡볶이": ("엽떡", "#dc2626", "#fef08a"),
+        "엽기떡볶이": ("엽떡", "#dc2626", "#fef08a"),
+        "한솥도시락": ("한솥", "#f97316", "#ffffff"),
+        "한솥": ("한솥", "#f97316", "#ffffff"),
+        "신전떡볶이": ("신전", "#b91c1c", "#ffffff"),
+        "역전할머니맥주": ("역전", "#ca8a04", "#ffffff"),
+        "역전할머니": ("역전", "#ca8a04", "#ffffff"),
+        "GS더프레시": ("GS", "#059669", "#ffffff"),
+        "무인양품": ("MUJI", "#7f1d1d", "#ffffff"),
+        "MUJI": ("MUJI", "#7f1d1d", "#ffffff"),
+        "롯데월드": ("LW", "#6b21a8", "#fde047"),
     }
 
     for key, (text, bg_color, font_color) in fallback_badges.items():
@@ -313,7 +329,7 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
     - Each branch shows road address as inline tooltip on hover with copy button.
     """
     logo_url = get_brand_logo(brand)
-    fallback_url = "https://www.google.com/s2/favicons?domain=google.com&sz=128"
+    fallback_badge = logo_url
 
     href = link if (link and link.startswith("http")) else f"https://search.naver.com/search.naver?query={html.escape(link or brand)}"
 
@@ -367,7 +383,7 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
         # Card header: logo + brand name
         f'<div class="info-card-header">'
         f'<img src="{logo_url}" '
-        f'onerror="this.onerror=null;this.src=\'{fallback_url}\';" '
+        f'onerror="this.onerror=null;this.src=\'{fallback_badge}\';" '
         f'class="info-card-logo" alt="{escaped_brand}" referrerpolicy="no-referrer" />'
         f'<span class="info-card-brand">{escaped_brand}</span>'
         f'</div>'
