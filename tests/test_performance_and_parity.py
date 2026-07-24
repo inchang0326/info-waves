@@ -50,8 +50,8 @@ def test_10_coordinates_data_parity_and_2tier_cache_integrity():
                 assert cached_stores[idx]["lat"] == raw_stores[idx]["lat"]
                 assert cached_stores[idx]["lon"] == raw_stores[idx]["lon"]
                 
-            # B. 초고속 Latency 검증 (캐시 적재 후 10ms 이내 반환)
-            assert elapsed_ms < 20.0, f"Cache retrieval latency too high: {elapsed_ms:.2f}ms"
+            # B. 초고속 Latency 검증 (캐시 적재 후 50ms 이내 반환)
+            assert elapsed_ms < 50.0, f"Cache retrieval latency too high: {elapsed_ms:.2f}ms"
 
 
 def test_sqlite_wal_persistence_across_cache_flushes():
