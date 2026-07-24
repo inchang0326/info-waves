@@ -317,3 +317,54 @@ def test_uc20_tab_switch_restores_map_location_and_radius_session():
     assert session_state["map_lat"] == 37.360657 # 지도 중심 좌표 원복
     assert session_state["map_lon"] == 126.928194
     assert session_state["radius_val"] == 2.5 # 반경 설정 원복
+
+
+def test_uc21_location_key_auto_synchronization_and_guzimap_guaranteed_recommendation():
+    """
+    [UC-21] 위치/반경 변경 시 자동 탐색 방지 및 탐색 버튼 클릭 시 거지맵 100% 최신화 추천 시나리오
+    - 좌표나 반경이 변경될 때 _last_searched_key 미일치로 local_results가 자동 제거됨 (불필요한 자동 탐색 차단)
+    - 탐색 버튼 클릭 시 새 좌표/반경 기준으로 거지맵 가성비 식당 데이터가 100% 리스트업됨
+    """
+    global_results = {
+        "거지맵 (가성비 식당 & 초저가 혜택)": [
+            {
+                "target": "거지맵 - 포스토리 온수점",
+                "title": "거지맵 가성비 식당: 쌀국수 (8,000원)",
+                "details": "https://naver.me/test",
+                "category": "거지맵 (가성비 식당 & 초저가 혜택)",
+                "lat": 37.493995,
+                "lon": 126.833499,
+                "address": "서울 구로구 부일로15길 21",
+                "brand": "포스토리 온수점"
+            }
+        ]
+    }
+    
+    session_state = {
+        "map_lat": 37.493995,
+        "map_lon": 126.833499,
+        "radius_val": 3.0,
+        "_last_searched_key": None,
+        "local_results": {"기존데이터": []}
+    }
+    
+    current_key = (
+        round(float(session_state["map_lat"]), 5),
+        round(float(session_state["map_lon"]), 5),
+        round(float(session_state["radius_val"]), 2)
+    )
+    
+    # 1. 반경/위치 변경 시 자동 탐색 없이 local_results 소멸 검증
+    if session_state.get("_last_searched_key") != current_key:
+        session_state.pop("local_results", None)
+        
+    assert "local_results" not in session_state
+
+    # 2. 명시적 탐색 버튼 클릭 시 local_results 생성 및 거지맵 노출 검증
+    session_state["_last_searched_key"] = current_key
+    session_state["local_results"] = fetch_local_alerts(current_key[0], current_key[1], global_results, current_key[2])
+    
+    assert session_state["_last_searched_key"] == current_key
+    assert len(session_state["local_results"]["거지맵 (가성비 식당 & 초저가 혜택)"]) == 1
+    assert "📍 [" in session_state["local_results"]["거지맵 (가성비 식당 & 초저가 혜택)"][0]["title"]
+

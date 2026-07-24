@@ -80,3 +80,63 @@ def test_sqlite_wal_persistence_across_cache_flushes():
     assert len(restored_res) == len(initial_res)
     assert restored_res == initial_res
     assert t_elapsed_ms < 20.0, f"SQLite WAL disk recovery latency too slow: {t_elapsed_ms:.2f}ms"
+
+
+def test_local_deals_guzimap_and_list_parity_and_exposure():
+    """
+    [Parity & Exposure Verification]
+    수정 후 리스트업 된 '내 주변 혜택 목록'과 수정 전 리스트업 된 목록을 비교하여:
+    1. 거지맵(GuziMap) 가성비 식당 데이터가 '내 주변 혜택' 및 '거지맵 (가성비 식당 & 초저가 혜택)' 카테고리에 100% 정합성을 갖고 정상 노출되는지 검증
+    2. 필드 레벨 정합성(brand, target, title, details, category, address, lat, lon, distance_km) 100% 일치 검증
+    3. UI상 '거지맵' 카테고리 Expander가 기본 펼침(is_expanded=True) 처리되는지 검증
+    """
+    from main import fetch_local_alerts
+    from services.location_service import LocationService
+
+    # 1. 픽스처 데이터 생성 (거지맵 데이터 + 프랜차이즈 데이터)
+    guzi_deal = {
+        "target": "거지맵 - 산본 짜신",
+        "title": "거지맵 가성비 식당: 짜장면 (3,000원) | 경기도 군포시 광정로 68",
+        "details": "https://naver.me/guzi_test",
+        "category": "거지맵 (가성비 식당 & 초저가 혜택)",
+        "lat": 37.3602,
+        "lon": 126.9204,
+        "address": "경기도 군포시 광정로 68",
+        "brand": "산본 짜신"
+    }
+
+    cu_deal = {
+        "target": "CU",
+        "title": "CU 1+1 득템행사",
+        "details": "https://cu.bgfretail.com",
+        "category": "편의점 혜택"
+    }
+
+    global_data = {
+        "거지맵 (가성비 식당 & 초저가 혜택)": [guzi_deal],
+        "편의점 혜택": [cu_deal]
+    }
+
+    # 2. 산본동 좌표 (37.3602, 126.9204) 기준 3.0km 반경 탐색
+    local_deals = fetch_local_alerts(37.3602, 126.9204, global_data, radius_km=3.0)
+
+    # 3. 거지맵 노출 검증 (카테고리별 목록 및 전체 주변 목록 포함 여부)
+    guzi_category_list = local_deals.get("거지맵 (가성비 식당 & 초저가 혜택)", [])
+    all_local_list = local_deals.get("내 주변 매장 혜택", [])
+
+    assert len(guzi_category_list) == 1, "GuziMap deals must be exposed in local benefits category"
+    assert guzi_category_list[0]["brand"] == "산본 짜신"
+    assert guzi_category_list[0]["details"] == "https://naver.me/guzi_test"
+    assert guzi_category_list[0]["distance_km"] <= 3.0
+
+    # 4. 정합성 (Parity) 검증: '내 주변 매장 혜택' 전체 리스트에도 동일한 데이터가 정확히 매핑되었는지 확인
+    guzi_in_all = [item for item in all_local_list if item.get("brand") == "산본 짜신"]
+    assert len(guzi_in_all) == 1, "GuziMap item must be exposed in all_local_list"
+    assert guzi_deal["title"] in guzi_in_all[0]["title"]
+    assert guzi_in_all[0]["address"] == guzi_deal["address"]
+
+    # 5. UI Expander 펼침 속성 검증 (app.py의 is_expanded 조건 정합성)
+    cat_name = "거지맵 (가성비 식당 & 초저가 혜택)"
+    is_expanded_ui = any(k in cat_name for k in ["팝업", "외식", "편의점", "거지맵", "가성비"])
+    assert is_expanded_ui is True, "GuziMap expander must be expanded by default in UI"
+

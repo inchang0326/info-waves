@@ -80,6 +80,8 @@ def get_brand_logo(brand_name: str) -> str:
         "SKT": "https://www.google.com/s2/favicons?domain=tworld.co.kr&sz=128",
         "KT": "https://www.google.com/s2/favicons?domain=kt.com&sz=128",
         "유플러스": "https://www.google.com/s2/favicons?domain=lguplus.com&sz=128",
+        "유플투쁠": "https://www.google.com/s2/favicons?domain=lguplus.com&sz=128",
+        "유플": "https://www.google.com/s2/favicons?domain=lguplus.com&sz=128",
         "토스": "https://www.google.com/s2/favicons?domain=toss.im&sz=128",
         "네이버": "https://www.google.com/s2/favicons?domain=naver.com&sz=128",
         "카카오": "https://www.google.com/s2/favicons?domain=kakaocorp.com&sz=128",
@@ -92,19 +94,25 @@ def get_brand_logo(brand_name: str) -> str:
         # 추가 브랜드 로고
         "서브웨이": "https://www.google.com/s2/favicons?domain=subway.co.kr&sz=128",
         "써브웨이": "https://www.google.com/s2/favicons?domain=subway.co.kr&sz=128",
-        "노브랜드": "https://www.google.com/s2/favicons?domain=nobrandburger.com&sz=128",
+        "노브랜드버거": "https://www.google.com/s2/favicons?domain=shinsegaefood.com&sz=128",
+        "노브랜드": "https://www.google.com/s2/favicons?domain=shinsegaefood.com&sz=128",
         "프랭크버거": "https://www.google.com/s2/favicons?domain=frankburger.co.kr&sz=128",
         "60계치킨": "https://www.google.com/s2/favicons?domain=60chicken.co.kr&sz=128",
         "노랑통닭": "https://www.google.com/s2/favicons?domain=norangtongdak.co.kr&sz=128",
+        "천년닭강정": "https://www.google.com/s2/favicons?domain=1000dak.co.kr&sz=128",
         "피자알볼로": "https://www.google.com/s2/favicons?domain=pizzaalvolo.co.kr&sz=128",
         "7번가피자": "https://www.google.com/s2/favicons?domain=7thpizza.com&sz=128",
+        "동대문엽기떡볶이": "https://www.google.com/s2/favicons?domain=yupdduk.com&sz=128",
         "엽기떡볶이": "https://www.google.com/s2/favicons?domain=yupdduk.com&sz=128",
+        "한솥도시락": "https://www.google.com/s2/favicons?domain=hsd.co.kr&sz=128",
         "한솥": "https://www.google.com/s2/favicons?domain=hsd.co.kr&sz=128",
         "두끼": "https://www.google.com/s2/favicons?domain=dookki.co.kr&sz=128",
-        "역전할머니맥주": "https://www.google.com/s2/favicons?domain=yukhalman.co.kr&sz=128",
+        "역전할머니맥주": "https://www.google.com/s2/favicons?domain=yeokjeonhalmae.com&sz=128",
+        "역전할머니": "https://www.google.com/s2/favicons?domain=yeokjeonhalmae.com&sz=128",
         "본죽": "https://www.google.com/s2/favicons?domain=bonif.co.kr&sz=128",
         "신전떡볶이": "https://www.google.com/s2/favicons?domain=sinjeon.co.kr&sz=128",
-        "홍콩반점": "https://www.google.com/s2/favicons?domain=zzambbong.com&sz=128",
+        "홍콩반점0410": "https://www.google.com/s2/favicons?domain=theborn.co.kr&sz=128",
+        "홍콩반점": "https://www.google.com/s2/favicons?domain=theborn.co.kr&sz=128",
         "원할머니보쌈": "https://www.google.com/s2/favicons?domain=bossam.co.kr&sz=128",
         "더벤티": "https://www.google.com/s2/favicons?domain=theventi.co.kr&sz=128",
         "공차": "https://www.google.com/s2/favicons?domain=gong-cha.co.kr&sz=128",
@@ -486,13 +494,13 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
     b_lower = str(brand or "").lower()
     c_lower = str(effective_cat or "").lower()
     
-    # 0. GuziMap (Beggar Map) Cheap Eatery - Unique Vibrant Lightblue Pin + Deep Dark Amber/Black Icon (Extreme Contrast)
+    # 0. GuziMap (Beggar Map) Cheap Eatery - Unique Lightblue Pin + White Cutlery Icon
     if "거지맵" in b_lower or "거지맵" in c_lower or "가성비" in c_lower:
-        return {"color": "lightblue", "icon": "cutlery", "icon_color": "#7C2D12", "prefix": "fa"}
+        return {"color": "lightblue", "icon": "cutlery", "icon_color": "black", "prefix": "fa"}
 
-    # 1. Pop-up Store & Exhibition / Event - Unique Luxury Black Pin + Neon Gold Star Icon (VIP Spotlight Contrast)
+    # 1. Pop-up Store & Exhibition / Event - Unique Black Pin + White Star Icon
     if "팝업" in b_lower or "팝업" in c_lower or "전시" in c_lower or "팝플리" in b_lower or "팝가" in b_lower or "헤이팝" in b_lower or ("더현대" in b_lower and "아울렛" not in b_lower):
-        return {"color": "black", "icon": "star", "icon_color": "#FFD700", "prefix": "fa"}
+        return {"color": "black", "icon": "star", "icon_color": "white", "prefix": "fa"}
         
     # 2. Convenience Store
     if "편의점" in c_lower or b_lower in ["cu", "gs25", "세븐일레븐", "이마트24", "씨유", "지에스25"]:

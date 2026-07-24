@@ -1,3 +1,4 @@
+import os
 import requests
 import urllib.parse
 from bs4 import BeautifulSoup
@@ -20,9 +21,10 @@ class GuziMapScraper(AbstractScraper):
 
     def scrape(self) -> List[Dict[str, str]]:
         url = "https://lzeazgyvjzireemncjep.supabase.co/rest/v1/restaurants_public?select=*"
+        supabase_key = os.getenv("GUZIMAP_API_KEY") or os.getenv("SUPABASE_KEY") or "sb_publishable_b7EOyF1IuulD2ZU-VYqtCA_2L3X6PSV"
         headers = {
-            "apikey": "sb_publishable_b7EOyF1IuulD2ZU-VYqtCA_2L3X6PSV",
-            "Authorization": "Bearer sb_publishable_b7EOyF1IuulD2ZU-VYqtCA_2L3X6PSV",
+            "apikey": supabase_key,
+            "Authorization": f"Bearer {supabase_key}",
             "User-Agent": "Mozilla/5.0"
         }
         results = []
@@ -65,22 +67,24 @@ class NaverPlaceDirectScraper(AbstractScraper):
         try:
             with sync_playwright() as p:
                 browser = p.chromium.launch(headless=True)
-                page = browser.new_page(user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1")
-                search_url = f"https://m.map.naver.com/search2/search.naver?query={self.query}"
-                page.goto(search_url, wait_until="domcontentloaded", timeout=10000)
-                
-                soup = BeautifulSoup(page.content(), 'html.parser')
-                items = soup.select('.item_tit')
-                for item in items[:3]:
-                    text = item.text.strip()
-                    if text:
-                        results.append({
-                            "target": "네이버 플레이스",
-                            "title": text,
-                            "details": search_url,
-                            "category": self.category
-                        })
-                browser.close()
+                try:
+                    page = browser.new_page(user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1")
+                    search_url = f"https://m.map.naver.com/search2/search.naver?query={self.query}"
+                    page.goto(search_url, wait_until="domcontentloaded", timeout=10000)
+                    
+                    soup = BeautifulSoup(page.content(), 'html.parser')
+                    items = soup.select('.item_tit')
+                    for item in items[:3]:
+                        text = item.text.strip()
+                        if text:
+                            results.append({
+                                "target": "네이버 플레이스",
+                                "title": text,
+                                "details": search_url,
+                                "category": self.category
+                            })
+                finally:
+                    browser.close()
         except Exception as e:
             logger.exception(f"Naver Place scraping failed: {e}")
         return results
@@ -123,27 +127,29 @@ class DynamicTopBrandsScraper(AbstractScraper):
         try:
             with sync_playwright() as p:
                 browser = p.chromium.launch(headless=True)
-                page = browser.new_page(user_agent="Mozilla/5.0")
-                page.goto("https://www.starbucks.co.kr/whats_new/campaign_list.do", wait_until="domcontentloaded", timeout=10000)
-                page.wait_for_selector('.campaign_list dl dt a', timeout=5000)
-                
-                items = page.evaluate("""
-                () => {
-                    let arr = [];
-                    document.querySelectorAll('.campaign_list dl dt a').forEach(a => {
-                        let img = a.querySelector('img');
-                        let title = img ? img.getAttribute('alt') : a.innerText;
-                        let onclick = a.getAttribute('onclick');
-                        let seq = onclick ? onclick.match(/goView\('(\d+)'\)/) : null;
-                        let href = seq ? "https://www.starbucks.co.kr/whats_new/campaign_view.do?pro_seq=" + seq[1] : a.href;
-                        if(title) arr.push({title: title.trim(), href: href});
-                    });
-                    return arr;
-                }
-                """)
-                for i in items[:3]:
-                    results.append({"target": "스타벅스", "title": i['title'], "details": i['href'], "category": "카페 및 베이커리/디저트"})
-                browser.close()
+                try:
+                    page = browser.new_page(user_agent="Mozilla/5.0")
+                    page.goto("https://www.starbucks.co.kr/whats_new/campaign_list.do", wait_until="domcontentloaded", timeout=10000)
+                    page.wait_for_selector('.campaign_list dl dt a', timeout=5000)
+                    
+                    items = page.evaluate("""
+                    () => {
+                        let arr = [];
+                        document.querySelectorAll('.campaign_list dl dt a').forEach(a => {
+                            let img = a.querySelector('img');
+                            let title = img ? img.getAttribute('alt') : a.innerText;
+                            let onclick = a.getAttribute('onclick');
+                            let seq = onclick ? onclick.match(/goView\('(\d+)'\)/) : null;
+                            let href = seq ? "https://www.starbucks.co.kr/whats_new/campaign_view.do?pro_seq=" + seq[1] : a.href;
+                            if(title) arr.push({title: title.trim(), href: href});
+                        });
+                        return arr;
+                    }
+                    """)
+                    for i in items[:3]:
+                        results.append({"target": "스타벅스", "title": i['title'], "details": i['href'], "category": "카페 및 베이커리/디저트"})
+                finally:
+                    browser.close()
         except Exception as e:
             logger.exception(f"Starbucks dynamic scraping failed: {e}")
 
@@ -220,7 +226,7 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "가마치통닭", "title": "두 마리 포장 할인 특가 & 치맥 프로모션", "details": "https://www.gamachi.co.kr/event", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "자담치킨", "title": "맵슐랭/티키타코 신메뉴 세트 할인 혜택", "details": "https://ejadam.co.kr/bbs/board.php?bo_table=event", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "굽네치킨", "title": "고추바사삭 할인 기획전 & 배달앱 제휴 프로모션", "details": "https://www.goobne.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
-            {"target": "천년닭강정", "title": "패밀리 사이즈 포장 할인 & 배달 리뷰 이벤트", "details": "https://search.naver.com/search.naver?query=%EC%B2%A3%EB%85%84%EB%8B%AD%EA%B0%95%EC%A0%95", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "천년닭강정", "title": "패밀리 사이즈 포장 할인 & 배달 리뷰 이벤트", "details": "https://1000dak.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
             
             # 베이커리 / 디저트
             {"target": "파리바게뜨", "title": "매월 1일 파바데이 & 해피오더 픽업 할인", "details": "https://www.paris.co.kr/promotion", "category": "카페 및 베이커리/디저트"},
@@ -234,7 +240,7 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "컴포즈커피", "title": "컴포즈 앱 멤버십 쿠폰 & 신메뉴 할인 프로모션", "details": "https://composecoffee.com/event", "category": "카페 및 베이커리/디저트"},
             {"target": "빽다방", "title": "빽다방 앱 스탬프 적립 & 앗!메리카노 특가", "details": "https://paikdabang.com/news/", "category": "카페 및 베이커리/디저트"},
             {"target": "이디야커피", "title": "이디야 멤버스 스탬프 쿠폰 & 이달의 콜라보 혜택", "details": "https://www.ediya.com/contents/event.html", "category": "카페 및 베이커리/디저트"},
-            {"target": "우지커피", "title": "앱 오더 할인 쿠폰 & 시즌 한정 음료 이벤트", "details": "https://search.naver.com/search.naver?query=%EC%9A%B0%EC%A7%80%EC%BB%A4%ED%94%B9", "category": "카페 및 베이커리/디저트"},
+            {"target": "우지커피", "title": "앱 오더 할인 쿠폰 & 시즌 한정 음료 이벤트", "details": "https://oozycoffee.com", "category": "카페 및 베이커리/디저트"},
             {"target": "엔제리너스", "title": "롯데잇츠 앱 쿠폰 & 네고왕 반값 프로모션", "details": "https://www.lotteeatz.com", "category": "카페 및 베이커리/디저트"},
             {"target": "매머드커피", "title": "매머드오더 선결제 할인 & 대용량 사이즈업 특가", "details": "https://www.mmthcoffee.com", "category": "카페 및 베이커리/디저트"},
             {"target": "투썸플레이스", "title": "투썸하트 피스케이크 증정 & 시즌 음료 혜택", "details": "https://www.twosome.co.kr", "category": "카페 및 베이커리/디저트"},
@@ -258,7 +264,7 @@ class HybridOfficialScraper(AbstractScraper):
             
             # 의류 / 영화관 / 테마파크
             {"target": "유니클로", "title": "유니클로 감사제 & 기간 한정 가격인하(세일)", "details": "https://www.uniqlo.com/kr/ko/", "category": "여가 및 쇼핑 혜택"},
-            {"target": "탑텐", "title": "탑텐 텐텐데이 & 행복제 1+1 폭탄 세일", "details": "https://search.naver.com/search.naver?query=%ED%83%9F%ED%85%90", "category": "여가 및 쇼핑 혜택"},
+            {"target": "탑텐", "title": "탑텐 텐텐데이 & 행복제 1+1 폭탄 세일", "details": "https://topten10mall.com", "category": "여가 및 쇼핑 혜택"},
             {"target": "메가박스", "title": "메가박스 빵원티켓 & 오리지널 티켓 증정 이벤트", "details": "https://www.megabox.co.kr/event", "category": "영화관 및 문화/테마파크"},
             {"target": "CGV", "title": "CGV 스피드쿠폰 & IMAX 스페셜 포스터 굿즈 혜택", "details": "https://www.cgv.co.kr/culture-event/event/defaultNew.aspx", "category": "영화관 및 문화/테마파크"},
             {"target": "롯데시네마", "title": "롯데시네마 싸다구 예매 & 콤보 선착순 할인", "details": "https://www.lottecinema.co.kr/NLCHS/Event", "category": "영화관 및 문화/테마파크"},
@@ -273,25 +279,21 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "네이버페이", "title": "네이버플러스 멤버십 데이 & 현장결제 포인트 뽑기", "details": "https://pay.naver.com", "category": "금융 및 앱테크"},
             {"target": "카카오페이", "title": "카카오페이 결제 리워드 & 페이포인트 적립 찬스", "details": "https://pay.kakao.com", "category": "금융 및 앱테크"},
             
-            # 핫딜 커뮤니티 (FMKorea 추가됨)
-            {"target": "에펨코리아", "title": "실시간 핫딜 및 초특가 상품 정보(유저 추천)", "details": "https://www.fmkorea.com/hotdeal", "category": "핫딜 커뮤니티"},
-
             # --- 신규 검증 브랜드 추가 ---
             # 외식 / 패스트푸드 / 피자 / 치킨 / 한식
             {"target": "서브웨이", "title": "이달의 썹프라이즈 & 앱 전용 쿠폰 혜택", "details": "https://www.subway.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
-            {"target": "노브랜드버거", "title": "NBB 앱 쿠폰 & 신메뉴 세트업 프로모션", "details": "https://search.naver.com/search.naver?query=%EB%85%B8%EB%B8%8C%EB%9E%99%EB%93%9C%EB%B2%84%EA%B1%B0", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "노브랜드버거", "title": "NBB 앱 쿠폰 & 신메뉴 세트업 프로모션", "details": "https://www.shinsegaefood.com/nobrandburger/", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "프랭크버거", "title": "이달의 경품 이벤트 & 수제버거 할인 혜택", "details": "https://www.frankburger.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "60계치킨", "title": "자사앱 퀴즈/리뷰 이벤트 & 포장 할인", "details": "https://www.60chicken.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
-            {"target": "노랑통닭", "title": "신메뉴 출시기념 할인 & 배달앱 제휴 쿠폰", "details": "https://search.naver.com/search.naver?query=%EB%85%B8%EB%9E%9B%ED%86%B5%EB%8B%AD", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "노랑통닭", "title": "신메뉴 출시기념 할인 & 배달앱 제휴 쿠폰", "details": "https://www.norangtongdak.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "피자알볼로", "title": "방문포장 할인 & 이달의 멤버십 혜택", "details": "https://www.pizzaalvolo.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "7번가피자", "title": "수/목요일 방문포장 최대 40% 할인 혜택", "details": "https://www.7thpizza.com", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "동대문엽기떡볶이", "title": "엽떡앱 주문 시 배달/포장 3,000원 상시 할인", "details": "https://www.yupdduk.com", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "한솥도시락", "title": "1월/8월 한솥 매일할인 & 요일별 특가 프로모션", "details": "https://www.hsd.co.kr/event/event_list", "category": "외식/패스트푸드 및 피자/치킨"},
-            {"target": "두끼", "title": "이달의 황금레시피 콜라보 & 무한리필 혜택", "details": "https://www.dookki.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
-            {"target": "역전할머니맥주", "title": "시즌 신메뉴 프로모션 & 모바일 상품권 이벤트", "details": "https://search.naver.com/search.naver?query=%EC%97%AD%EC%A0%84%ED%95%A0%EB%A8%B8%EB%8B%80%EB%A7%A5%EC%A3%BC", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "역전할머니맥주", "title": "시즌 신메뉴 프로모션 & 모바일 상품권 이벤트", "details": "https://www.yeokjeonhalmae.com", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "본죽", "title": "본오더 앱 전용 3,000원 할인 & 페이백 프로모션", "details": "https://www.bonif.co.kr/event/list", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "신전떡볶이", "title": "신전 앱 첫 구매 쿠폰 & 모바일 상품권 이벤트", "details": "http://www.sinjeon.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
-            {"target": "홍콩반점0410", "title": "짜장면데이/단무지데이 파격 할인 프로모션", "details": "https://search.naver.com/search.naver?query=%ED%99%8D%EC%BD%A9%EB%B0%98%EC%A0%900410", "category": "외식/패스트푸드 및 피자/치킨"},
+            {"target": "홍콩반점0410", "title": "짜장면데이/단무지데이 파격 할인 프로모션", "details": "https://www.theborn.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
             {"target": "원할머니보쌈", "title": "수요일 방문포장 할인 & 팩 할인 혜택", "details": "https://bossam.co.kr", "category": "외식/패스트푸드 및 피자/치킨"},
 
             # 카페 / 베이커리 / 디저트
@@ -310,7 +312,7 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "GS더프레시", "title": "GS수퍼 갓세일 & 매주 수요일 오프라인 파격 세일", "details": "https://www.gsretail.com", "category": "대형마트 통합"},
             {"target": "이마트에브리데이", "title": "에브리데이 전단 특가 & 쓱데이 연계 할인", "details": "https://www.emarteveryday.co.kr", "category": "대형마트 통합"},
             {"target": "무인양품", "title": "무지위크(MUJI WEEK) 전 품목 10% 회원 할인", "details": "https://www.muji.kr", "category": "여가 및 쇼핑 혜택"},
-            {"target": "모던하우스", "title": "모던하우스 브랜드데이 20% 세일 & 리빙 특가", "details": "https://search.naver.com/search.naver?query=%EB%AA%A8%EB%8D%98%ED%95%98%EC%9A%B0%EC%8A%A4", "category": "여가 및 쇼핑 혜택"},
+            {"target": "모던하우스", "title": "모던하우스 브랜드데이 20% 세일 & 리빙 특가", "details": "https://www.modernhousemall.com", "category": "여가 및 쇼핑 혜택"},
             {"target": "아트박스", "title": "아트박스 멤버십데이 & 신학기/시즌 세일", "details": "https://www.poom.co.kr", "category": "여가 및 쇼핑 혜택"},
             {"target": "스파오", "title": "스파오 릴레이 세일 & 쿨테크/발열내의 파격 할인", "details": "https://spao.com", "category": "여가 및 쇼핑 혜택"},
             {"target": "ABC마트", "title": "ABC마트 결산 세일 & 한가위/설날 파격 세일", "details": "https://abcmart.a-rt.com", "category": "여가 및 쇼핑 혜택"},
@@ -337,15 +339,6 @@ class HybridOfficialScraper(AbstractScraper):
             {"target": "헤이팝 (heyPOP)", "title": "전국 트렌디 브랜드 & 라이프스타일 팝업스토어/전시 소식", "details": "https://heypop.kr", "category": "팝업스토어 & 전시/행사"}
         ]
         
-        # 동시성(Thread)을 이용해 50개 업체의 최신 뉴스를 1~2초만에 긁어와 병합
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
-            future_to_item = {executor.submit(self._fetch_news_headline, item["target"]): item for item in base_data}
-            for future in concurrent.futures.as_completed(future_to_item):
-                item = future_to_item[future]
-                new_headline = future.result()
-                if new_headline:
-                    item["title"] = item["title"] + new_headline
-
         # 거지맵 (저예산 식당 & 초저가 혜택) 데이터 병합
         try:
             guzi_items = GuziMapScraper().scrape()

@@ -48,32 +48,3 @@ def test_hybrid_official_scraper_base_data_integrity():
             assert "title" in item and len(item["title"]) > 0
             assert "details" in item and item["details"].startswith(("http://", "https://"))
             assert "category" in item and len(item["category"]) > 0
-
-def test_hybrid_official_scraper_news_headline_enrichment():
-    """Google News RSS 성공 시 [신규] 태그가 혜택 타이틀에 정상 결합되는지 검증합니다."""
-    fake_rss_xml = """<?xml version="1.0" encoding="UTF-8"?>
-    <rss version="2.0">
-        <channel>
-            <item>
-                <title>CU, 7월 득템행사 개최 - 구글뉴스</title>
-            </item>
-        </channel>
-    </rss>
-    """
-    scraper = HybridOfficialScraper()
-    
-    # RSS 연동 성공 케이스
-    with patch("services.scraper_service.requests.get") as mock_get:
-        mock_resp = MagicMock()
-        mock_resp.status_code = 200
-        mock_resp.text = fake_rss_xml
-        mock_get.return_value = mock_resp
-        
-        headline = scraper._fetch_news_headline("CU")
-        assert headline == " & [신규] CU, 7월 득템행사 개최"
-
-    # RSS 연동 실패/타임아웃 케이스 -> 빈 문자열 반환되어 원본 타이틀 훼손 방지
-    with patch("services.scraper_service.requests.get") as mock_get:
-        mock_get.side_effect = Exception("News RSS Timeout")
-        headline = scraper._fetch_news_headline("CU")
-        assert headline == ""

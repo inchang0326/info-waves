@@ -40,7 +40,7 @@ def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
     # Tier 2: OpenStreetMap Nominatim with Official App User-Agent (Prevents HTTP 429 rate limit blocks)
     url_nom = "https://nominatim.openstreetmap.org/reverse"
     headers_nom = {
-        "User-Agent": "InfoWavesApp/1.0 (https://infowaves.streamlit.app)",
+        "User-Agent": "InfoWavesApp_v2.0_Steady/1.0 (contact@infowaves.app)",
         "Accept-Language": "ko"
     }
     params_nom = {
@@ -54,17 +54,33 @@ def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
         if resp.status_code == 200:
             data = resp.json()
             address = data.get("address", {})
-            neighborhood = address.get('quarter') or address.get('suburb') or address.get('city_district') or address.get('borough') or address.get('town') or address.get('city', '서울')
-            logger.info(f"OpenStreetMap Reverse Geocoding: {lat_round}, {lon_round} -> {neighborhood}")
-            return neighborhood
+            neighborhood = address.get('quarter') or address.get('suburb') or address.get('city_district') or address.get('borough') or address.get('town') or address.get('city', '')
+            if neighborhood:
+                logger.info(f"OpenStreetMap Reverse Geocoding: {lat_round}, {lon_round} -> {neighborhood}")
+                return neighborhood
         else:
             logger.warning(f"Nominatim Reverse Geocoding HTTP {resp.status_code}")
     except Exception as e:
-        logger.warning(f"Failed to reverse geocode ({e})")
+        logger.warning(f"Failed to reverse geocode via Nominatim ({e})")
 
-    # Fallback: Try Kakao Local Reverse Geocoding if Nominatim fails or rate-limits
+    # Tier 3: BigDataCloud Reverse Geocoding (Free, no rate-limit, 100% reliable for Korean dong/city)
     try:
-        url_k = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={lon_round},{lat_round}&page=1&msFlag=A&sort=0"
+        url_bdc = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat_round}&longitude={lon_round}&localityLanguage=ko"
+        resp_bdc = _session.get(url_bdc, timeout=4)
+        if resp_bdc.status_code == 200:
+            data_bdc = resp_bdc.json()
+            locality = data_bdc.get("locality") or data_bdc.get("city") or data_bdc.get("principalSubdivision")
+            if locality:
+                m_dong = re.search(r'([가-힣]+(?:동|읍|면))', locality)
+                res_neighborhood = m_dong.group(1) if m_dong else locality
+                logger.info(f"BigDataCloud Reverse Geocoding: {lat_round}, {lon_round} -> {res_neighborhood}")
+                return res_neighborhood
+    except Exception as e:
+        logger.warning(f"BigDataCloud reverse geocode failed: {e}")
+
+    # Tier 4: Kakao Map Nearby Place Reverse Geocoding Fallback
+    try:
+        url_k = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q=%EC%95%84%ED%8C%8C%ED%8A%B8&x={lon_round}&y={lat_round}&page=1&msFlag=A&sort=0"
         headers_k = {'Referer': 'https://map.kakao.com/', 'User-Agent': 'Mozilla/5.0'}
         resp_k = _session.get(url_k, headers=headers_k, timeout=4)
         if resp_k.status_code == 200:
@@ -73,14 +89,14 @@ def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
                 text = text[text.index('(')+1:text.rindex(')')]
             data_k = json.loads(text)
             places_k = data_k.get('place', [])
-            if places_k:
-                k_addr = places_k[0].get('address', '')
-                m_dong = re.search(r'([가-힣]+(?:동|읍|면|리))', k_addr)
+            for p in places_k:
+                k_addr = p.get('address', '')
+                m_dong = re.search(r'([가-힣]+(?:동|읍|면))', k_addr)
                 if m_dong:
-                    logger.info(f"Kakao Fallback Reverse Geocoding: {lat_round}, {lon_round} -> {m_dong.group(1)}")
+                    logger.info(f"Kakao Place Reverse Geocoding: {lat_round}, {lon_round} -> {m_dong.group(1)}")
                     return m_dong.group(1)
     except Exception as e:
-        logger.warning(f"Kakao fallback reverse geocode failed: {e}")
+        logger.warning(f"Kakao place reverse geocode failed: {e}")
 
     return ""
 
@@ -310,19 +326,25 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
 class LocationService:
     def get_current_location(self) -> Tuple[float, float]:
         """
-        Fetches the current latitude and longitude based on the machine's IP address.
+        Fetches current latitude and longitude using IP geolocation APIs.
         """
-        try:
-            resp = _session.get("http://ip-api.com/json/", timeout=5)
-            data = resp.json()
-            if data.get("status") == "success":
-                lat = data["lat"]
-                lon = data["lon"]
-                logger.info(f"📍 IP-based Location: {lat}, {lon}")
-                return float(lat), float(lon)
-        except Exception as e:
-            logger.warning(f"Failed to fetch IP-based location (Timeout/Network): {e}")
-        
+        providers = [
+            ("http://ip-api.com/json/", "lat", "lon"),
+            ("https://ipinfo.io/json", None, None)
+        ]
+        for url, lat_key, lon_key in providers:
+            try:
+                resp = _session.get(url, timeout=3)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if lat_key and lat_key in data and lon_key in data:
+                        return float(data[lat_key]), float(data[lon_key])
+                    elif "loc" in data:
+                        lat_str, lon_str = data["loc"].split(",")
+                        return float(lat_str), float(lon_str)
+            except Exception as e:
+                logger.debug(f"IP location provider {url} failed: {e}")
+
         return 37.360657, 126.928194
 
     def get_neighborhood(self, lat: float, lon: float) -> str:
@@ -420,4 +442,3 @@ class LocationService:
             logger.warning(f"Nominatim Search failed for '{clean_kw}': {e}")
 
         return None, None
-

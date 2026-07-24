@@ -27,22 +27,15 @@ def test_run_scrapers_categorization():
     assert res["기타"][0]["target"] == "알수없는곳"
 
 def test_fetch_global_alerts():
-    """fetch_global_alerts() 파이프라인 호출 시 모든 15개 카테고리 키가 정상 포함된 딕셔너리를 반환하는지 검증합니다."""
-    with patch("main.HybridOfficialScraper") as mock_hybrid, \
-         patch("main.RuliwebHotDealScraper") as mock_ruli:
-        
+    """fetch_global_alerts() 파이프라인 호출 시 하이브리드 스크래퍼 기반 딕셔너리를 반환하는지 검증합니다."""
+    with patch("main.HybridOfficialScraper") as mock_hybrid:
         mock_hybrid.return_value.scrape.return_value = [
             {"target": "GS25", "title": "GS 갓세일", "details": "http://gs25.com", "category": "편의점 혜택"}
-        ]
-        mock_ruli.return_value.scrape.return_value = [
-            {"target": "루리웹", "title": "루리웹 특가", "details": "http://ruliweb.com", "category": "핫딜 커뮤니티"}
         ]
         
         alerts = fetch_global_alerts()
         assert "편의점 혜택" in alerts
-        assert "핫딜 커뮤니티" in alerts
         assert len(alerts["편의점 혜택"]) == 1
-        assert len(alerts["핫딜 커뮤니티"]) == 1
 
 def test_fetch_local_alerts_mapping():
     """사용자 좌표 기반으로 오프라인 카테고리 혜택이 내 주변 매장으로 역매핑되어 '내 주변 매장 혜택' 딕셔너리로 통합되는지 검증합니다."""

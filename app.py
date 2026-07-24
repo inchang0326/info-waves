@@ -681,6 +681,17 @@ st.markdown(f"""
         div[data-testid="column"]:has(h4) h4 {{
             margin-top: 4px !important;
         }}
+
+        /* Clean Textless Loading Spinner CSS */
+        div[data-testid="stSpinner"] > div > p,
+        div[data-testid="stSpinner"] span,
+        div[data-testid="stSpinner"] label {{
+            display: none !important;
+        }}
+        div[data-testid="stSpinner"] > div {{
+            margin: 10px auto !important;
+            justify-content: center !important;
+        }}
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -702,7 +713,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=60, show_spinner=False)
 def get_global_data():
     try:
         return fetch_global_alerts()
@@ -739,7 +750,7 @@ if not st.session_state.get("_device_loc_initialized"):
         st.session_state["map_lon"] = dev_lon
         st.session_state["map_key_id"] += 1
         logger.info(f"📍 Device Real Location Initialized: {dev_lat}, {dev_lon}")
-        st.rerun()
+#        st.rerun()
 
 def handle_search():
     sq = st.session_state.get("kmap_search", "")
@@ -752,8 +763,7 @@ def handle_search():
             st.session_state["data_view"] = "내 주변 맞춤 혜택"
             st.session_state["map_click_disabled"] = False
             st.session_state.pop("_search_error", None)
-            if "local_results" in st.session_state:
-                del st.session_state["local_results"]
+            st.session_state.pop("local_results", None)
             st.rerun()
         else:
             err_msg = f"'{sq}'의 위치를 찾을 수 없습니다."
@@ -783,9 +793,20 @@ if st.session_state.get("_search_error"):
     st.warning(st.session_state["_search_error"], icon="⚠️")
     st.session_state.pop("_search_error", None)
 
-# --- Ensure coordinates are globally available for map rendering ---
+# --- Ensure coordinates & radius are globally synchronized ---
 lat_input = st.session_state["map_lat"]
 lon_input = st.session_state["map_lon"]
+radius_input = st.session_state.get("radius_val", 3.0)
+
+current_loc_key = (
+    round(float(lat_input), 5),
+    round(float(lon_input), 5),
+    round(float(radius_input), 2)
+)
+
+# Pop local_results if user has not explicitly clicked "🔍 탐색" for the current coordinates/radius key
+if st.session_state.get("_last_searched_key") != current_loc_key:
+    st.session_state.pop("local_results", None)
 
 # --- Main Layout ---
 if curr_view == "내 주변 맞춤 혜택":
@@ -890,8 +911,7 @@ if curr_view == "내 주변 맞춤 혜택":
                         st.session_state["map_lon"] = m_lon
                         st.session_state["map_key_id"] += 1
                         st.session_state["data_view"] = "내 주변 맞춤 혜택"
-                        if "local_results" in st.session_state:
-                            del st.session_state["local_results"]
+                        st.session_state.pop("local_results", None)
                         st.rerun()
 
         # 2. Folium Map rendering
@@ -920,8 +940,7 @@ if curr_view == "내 주변 맞춤 혜택":
                     st.session_state["map_lon"] = c_lon
                     st.session_state["map_key_id"] += 1
                     st.session_state["data_view"] = "내 주변 맞춤 혜택"
-                    if "local_results" in st.session_state:
-                        del st.session_state["local_results"]
+                    st.session_state.pop("local_results", None)
                     st.rerun()
 
         # 3. Search Button directly attached BELOW the map (not floated)
@@ -929,9 +948,11 @@ if curr_view == "내 주변 맞춤 혜택":
         if st.button("🔍 탐색", use_container_width=True, type="primary"):
             c_lat, c_lon = st.session_state["map_lat"], st.session_state["map_lon"]
             radius_km_val = st.session_state.get("radius_val", 3.0)
+            searched_key = (round(float(c_lat), 5), round(float(c_lon), 5), round(float(radius_km_val), 2))
             
             with st.spinner(""):
                 try:
+                    st.session_state["_last_searched_key"] = searched_key
                     st.session_state["local_results"] = fetch_local_alerts(c_lat, c_lon, global_results, radius_km_val)
                     st.session_state["_local_results_ver"] = st.session_state.get("_local_results_ver", 0) + 1
                 except Exception as e:
@@ -976,7 +997,7 @@ if curr_view == "내 주변 맞춤 혜택":
                     if key not in grouped_items: grouped_items[key] = []
                     grouped_items[key].append(item)
                     
-                is_expanded = any(k in cat for k in ["팝업", "외식", "편의점"])
+                is_expanded = any(k in cat for k in ["팝업", "외식", "편의점", "거지맵", "가성비"])
                 with st.expander(format_expander_title(cat, len(grouped_items)), expanded=is_expanded):
                     for (brand, title, link), branch_items in grouped_items.items():
                         card = generate_card_html(brand, title, link, branch_items)
@@ -992,10 +1013,11 @@ else:
         st.info("현재 수집된 전국구 정보가 없습니다.")
     else:
         for category, items in global_results.items():
-            if not items: continue
-            with st.expander(format_expander_title(category, len(items)), expanded=True):
+            if not items or any(k in category for k in ["거지맵", "커뮤니티", "루리웹", "에펨"]): continue
+            is_expanded_g = ("팝업" in category or "편의점" in category)
+            with st.expander(format_expander_title(category, len(items)), expanded=is_expanded_g):
                 col1, col2, col3 = st.columns(3)
-                for i, item in enumerate(items):
+                for i, item in enumerate(items[:30]):
                     col = [col1, col2, col3][i % 3]
                     target = item.get("target", "알 수 없음")
                     title = item.get("title", "")

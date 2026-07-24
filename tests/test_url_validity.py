@@ -36,4 +36,8 @@ def test_all_brand_urls_non_404():
 
     broken_urls = [r for r in results if r is not None]
     assert len(broken_urls) == 0, f"Found 404/500 error URLs: {broken_urls}"
+    
+    # 또한 어떤 브랜드도 네이버 검색결과(search.naver.com)로 랜딩되지 않는지 강력 검증
+    naver_search_urls = [item.get("details") for item in items if "search.naver.com" in item.get("details", "")]
+    assert len(naver_search_urls) == 0, f"Found Naver search landing URLs: {naver_search_urls}"
 

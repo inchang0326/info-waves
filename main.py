@@ -1,5 +1,6 @@
 import urllib.parse
 import concurrent.futures
+import re
 from services.location_service import LocationService
 from services.scraper_service import (
     RuliwebHotDealScraper, NaverPlaceDirectScraper,
@@ -12,7 +13,6 @@ def fetch_global_alerts() -> dict:
     logger.info("글로벌(위치 무관) 데이터 스크래핑을 시작합니다...")
     scrapers = [
         HybridOfficialScraper(),
-        RuliwebHotDealScraper(),
     ]
     return _run_scrapers(scrapers)
 import streamlit as st
@@ -41,22 +41,34 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
     
     all_local_items = []
     
-    # 거지맵 (가성비 식당 & 초저가 혜택) 직접 위치 정밀 필터링
+    # 거지맵 (가성비 식당 & 초저가 혜택) 정밀 위치 필터링 및 근접 추천 폴백
     guzi_global = _global_results.get("거지맵 (가성비 식당 & 초저가 혜택)", [])
+    guzi_with_dist = []
     for item in guzi_global:
         i_lat = item.get("lat")
         i_lon = item.get("lon")
         if i_lat is not None and i_lon is not None:
             dist = location_service._calculate_distance(lat, lon, i_lat, i_lon)
-            if dist <= radius_km:
-                mapped_item = dict(item)
-                mapped_item["distance_km"] = round(dist, 2)
-                mapped_item["target"] = item.get("brand", item.get("target"))
-                local_categorized_results["거지맵 (가성비 식당 & 초저가 혜택)"].append(mapped_item)
-                
-                local_item = dict(mapped_item)
-                local_item["category"] = "내 주변 매장 혜택"
-                all_local_items.append(local_item)
+            mapped_item = dict(item)
+            mapped_item["distance_km"] = round(dist, 2)
+            mapped_item["target"] = item.get("brand", item.get("target"))
+            mapped_item["orig_category"] = "거지맵 (가성비 식당 & 초저가 혜택)"
+            guzi_with_dist.append((dist, mapped_item))
+
+    # 지정 반경(radius_km) 이내 매장 엄격 필터링 (폴백 추천 철거)
+    guzi_within_radius = [m for d, m in guzi_with_dist if d <= radius_km]
+
+    for mapped_item in guzi_within_radius:
+        item_copy = dict(mapped_item)
+        dist_val = item_copy.get("distance_km", 0.0)
+        raw_title = item_copy.get("title", "")
+        clean_title = re.sub(r"^📍\s*\[[\d\.]+km\]\s*", "", raw_title)
+        item_copy["title"] = f"📍 [{dist_val}km] {clean_title}"
+        local_categorized_results["거지맵 (가성비 식당 & 초저가 혜택)"].append(item_copy)
+        
+        local_item = dict(item_copy)
+        local_item["category"] = "내 주변 매장 혜택"
+        all_local_items.append(local_item)
     
     for cat in list(local_categorized_results.keys()):
         if cat == "거지맵 (가성비 식당 & 초저가 혜택)":
