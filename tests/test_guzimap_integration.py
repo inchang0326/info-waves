@@ -75,9 +75,9 @@ def test_guzimap_ui_styling_and_formatting():
     title = format_expander_title("거지맵 (가성비 식당 & 초저가 혜택)", 5)
     assert "거지맵 (가성비 식당) (5개)" in title
     
-    # 2. Marker Icon & Color (Vibrant lightgreen pin for maximum map contrast)
+    # 2. Marker Icon & Color (Vibrant lightblue pin with high contrast dark amber icon)
     icon_info = get_category_marker_icon("짜신 산본본점", "거지맵 (가성비 식당 & 초저가 혜택)")
-    assert icon_info["color"] == "lightgreen"
+    assert icon_info["color"] == "lightblue"
     assert icon_info["icon"] == "cutlery"
     assert icon_info["prefix"] == "fa"
     

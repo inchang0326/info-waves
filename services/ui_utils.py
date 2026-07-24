@@ -486,13 +486,13 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
     b_lower = str(brand or "").lower()
     c_lower = str(effective_cat or "").lower()
     
-    # 0. GuziMap (Beggar Map) Cheap Eatery - Highly visible vibrant lightgreen pin with darkgreen icon
+    # 0. GuziMap (Beggar Map) Cheap Eatery - Unique Vibrant Lightblue Pin + Deep Dark Amber/Black Icon (Extreme Contrast)
     if "거지맵" in b_lower or "거지맵" in c_lower or "가성비" in c_lower:
-        return {"color": "lightgreen", "icon": "cutlery", "icon_color": "#064E3B", "prefix": "fa"}
+        return {"color": "lightblue", "icon": "cutlery", "icon_color": "#7C2D12", "prefix": "fa"}
 
-    # 1. Pop-up Store & Exhibition / Event
+    # 1. Pop-up Store & Exhibition / Event - Unique Luxury Black Pin + Neon Gold Star Icon (VIP Spotlight Contrast)
     if "팝업" in b_lower or "팝업" in c_lower or "전시" in c_lower or "팝플리" in b_lower or "팝가" in b_lower or "헤이팝" in b_lower or ("더현대" in b_lower and "아울렛" not in b_lower):
-        return {"color": "pink", "icon": "star", "icon_color": "white", "prefix": "fa"}
+        return {"color": "black", "icon": "star", "icon_color": "#FFD700", "prefix": "fa"}
         
     # 2. Convenience Store
     if "편의점" in c_lower or b_lower in ["cu", "gs25", "세븐일레븐", "이마트24", "씨유", "지에스25"]:
