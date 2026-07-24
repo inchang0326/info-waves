@@ -118,4 +118,19 @@ def test_unlimited_store_collection_capacity():
     cu_stores = service.search_nearby_brand(lat, lon, neighborhood, "CU", max_distance_km=5.0)
     assert len(cu_stores) > 25
 
+def test_popup_store_strict_geofencing():
+    """팝업스토어 탐색 시 35km 강제 확장 없이 선택한 반경(max_distance_km)을 엄격히 준수하여 반경 초과 지점이 거러지는지 검증합니다."""
+    service = LocationService()
+    
+    close_popup = {"name": "팝업 롯데피트인 산본점", "address": "산본동 1145", "lat": 37.3600, "lon": 126.9320}
+    far_seoul_popup = {"name": "하우스 오브 토이스토리 팝업 @성수", "address": "성수동2가 302", "lat": 37.5441, "lon": 127.0517}
+    
+    with patch("services.location_service._cached_search_nearby_brand") as mock_search:
+        mock_search.return_value = (close_popup, far_seoul_popup)
+        
+        # 고산로 517번길 20 (산본동)에서 3.0km 반경 탐색 시 25km 떨어진 성수동 팝업은 엄격 제외되어 1개만 반환되어야 함
+        filtered = service.search_nearby_brand(37.3602, 126.9204, "산본동", "팝업스토어", max_distance_km=3.0)
+        assert len(filtered) == 1
+        assert filtered[0]["name"] == "팝업 롯데피트인 산본점"
+
 
