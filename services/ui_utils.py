@@ -129,6 +129,9 @@ def get_brand_logo(brand_name: str) -> str:
         "쏘카": "https://www.google.com/s2/favicons?domain=socar.kr&sz=128",
         "GS칼텍스": "https://www.google.com/s2/favicons?domain=gscaltex.com&sz=128",
 
+        # 거지맵 (가성비 식당 & 초저가 혜택)
+        "거지맵": "https://www.google.com/s2/favicons?domain=xn--v69ak0xskm.com&sz=128",
+
         # 팝업스토어 & 전시/행사
         "팝플리": "https://www.google.com/s2/favicons?domain=popply.co.kr&sz=128",
         "팝가": "https://www.google.com/s2/favicons?domain=popga.co.kr&sz=128",
@@ -434,6 +437,10 @@ def format_expander_title(category: str, count: int) -> str:
         clean_cat = "영화관/문화"
     elif clean_cat == "팝업스토어 & 전시/행사":
         clean_cat = "팝업스토어"
+    elif clean_cat == "거지맵 (가성비 식당 & 초저가)":
+        clean_cat = "거지맵 (가성비 식당)"
+    elif "거지맵" in clean_cat:
+        clean_cat = "거지맵 (가성비 식당)"
         
     return f"{clean_cat} ({count}개)"
 
@@ -447,7 +454,9 @@ def infer_category_from_brand(brand: str, category: str = "") -> str:
         return category
         
     b = str(brand or "").lower()
-    if "팝업" in b or "팝플리" in b or "팝가" in b or "헤이팝" in b or "더현대" in b:
+    if "거지맵" in b or "거지" in b or "가성비 식당" in b:
+        return "거지맵 (가성비 식당 & 초저가 혜택)"
+    elif "팝업" in b or "팝플리" in b or "팝가" in b or "헤이팝" in b or "더현대" in b:
         return "팝업스토어 & 전시/행사"
     elif b in ["cu", "gs25", "세븐일레븐", "이마트24", "씨유", "지에스25"]:
         return "편의점 혜택"
@@ -477,6 +486,10 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
     b_lower = str(brand or "").lower()
     c_lower = str(effective_cat or "").lower()
     
+    # 0. GuziMap (Beggar Map) Cheap Eatery
+    if "거지맵" in b_lower or "거지맵" in c_lower or "가성비" in c_lower:
+        return {"color": "darkgreen", "icon": "cutlery", "icon_color": "white", "prefix": "fa"}
+
     # 1. Pop-up Store & Exhibition / Event
     if "팝업" in b_lower or "팝업" in c_lower or "전시" in c_lower or "팝플리" in b_lower or "팝가" in b_lower or "헤이팝" in b_lower or ("더현대" in b_lower and "아울렛" not in b_lower):
         return {"color": "pink", "icon": "star", "icon_color": "white", "prefix": "fa"}

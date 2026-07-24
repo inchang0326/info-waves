@@ -14,6 +14,46 @@ class AbstractScraper:
     def scrape(self) -> List[Dict[str, str]]:
         raise NotImplementedError
 
+class GuziMapScraper(AbstractScraper):
+    def __init__(self):
+        super().__init__("거지맵 (저예산 식당 & 초저가 혜택)")
+
+    def scrape(self) -> List[Dict[str, str]]:
+        url = "https://lzeazgyvjzireemncjep.supabase.co/rest/v1/restaurants_public?select=*"
+        headers = {
+            "apikey": "sb_publishable_b7EOyF1IuulD2ZU-VYqtCA_2L3X6PSV",
+            "Authorization": "Bearer sb_publishable_b7EOyF1IuulD2ZU-VYqtCA_2L3X6PSV",
+            "User-Agent": "Mozilla/5.0"
+        }
+        results = []
+        try:
+            resp = requests.get(url, headers=headers, timeout=6)
+            if resp.status_code == 200:
+                data = resp.json()
+                for r in data:
+                    name = r.get("name")
+                    if not name: continue
+                    menu = r.get("latest_menu_name") or "가성비 식단"
+                    price = r.get("latest_price_krw")
+                    price_str = f" ({price:,}원)" if price else ""
+                    addr = r.get("address", "")
+                    link = r.get("naver_place_id") or "https://xn--v69ak0xskm.com"
+                    title = f"거지맵 가성비 식당: {menu}{price_str} | {addr}"
+                    
+                    results.append({
+                        "target": f"거지맵 - {name}",
+                        "title": title,
+                        "details": link,
+                        "category": "거지맵 (가성비 식당 & 초저가 혜택)",
+                        "lat": float(r.get("lat")) if r.get("lat") else None,
+                        "lon": float(r.get("lng")) if r.get("lng") else None,
+                        "address": addr,
+                        "brand": name
+                    })
+        except Exception as e:
+            logger.exception(f"GuziMap scraping failed: {e}")
+        return results
+
 class NaverPlaceDirectScraper(AbstractScraper):
     def __init__(self, query: str, category: str):
         super().__init__(f"네이버 플레이스 직접 크롤링: {query}")
@@ -305,5 +345,13 @@ class HybridOfficialScraper(AbstractScraper):
                 new_headline = future.result()
                 if new_headline:
                     item["title"] = item["title"] + new_headline
+
+        # 거지맵 (저예산 식당 & 초저가 혜택) 데이터 병합
+        try:
+            guzi_items = GuziMapScraper().scrape()
+            if guzi_items:
+                base_data.extend(guzi_items)
+        except Exception as e:
+            logger.exception(f"GuziMap fetch error: {e}")
 
         return base_data

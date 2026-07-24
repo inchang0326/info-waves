@@ -34,12 +34,32 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
         "백화점 및 프리미엄 아울렛": [],
         "여가 및 쇼핑 혜택": [],
         "영화관 및 문화/테마파크": [],
-        "팝업스토어 & 전시/행사": []
+        "팝업스토어 & 전시/행사": [],
+        "거지맵 (가성비 식당 & 초저가 혜택)": []
     }
     
     all_local_items = []
     
+    # 거지맵 (가성비 식당 & 초저가 혜택) 직접 위치 정밀 필터링
+    guzi_global = _global_results.get("거지맵 (가성비 식당 & 초저가 혜택)", [])
+    for item in guzi_global:
+        i_lat = item.get("lat")
+        i_lon = item.get("lon")
+        if i_lat is not None and i_lon is not None:
+            dist = location_service._calculate_distance(lat, lon, i_lat, i_lon)
+            if dist <= radius_km:
+                mapped_item = dict(item)
+                mapped_item["distance_km"] = round(dist, 2)
+                mapped_item["target"] = item.get("brand", item.get("target"))
+                local_categorized_results["거지맵 (가성비 식당 & 초저가 혜택)"].append(mapped_item)
+                
+                local_item = dict(mapped_item)
+                local_item["category"] = "내 주변 매장 혜택"
+                all_local_items.append(local_item)
+    
     for cat in list(local_categorized_results.keys()):
+        if cat == "거지맵 (가성비 식당 & 초저가 혜택)":
+            continue
         items_in_cat = _global_results.get(cat, [])
         if not items_in_cat: continue
         
@@ -111,6 +131,7 @@ def _run_scrapers(scrapers) -> dict:
         "여행 및 숙박": [],
         "핫딜 커뮤니티": [],
         "팝업스토어 & 전시/행사": [],
+        "거지맵 (가성비 식당 & 초저가 혜택)": [],
         "기타": []
     }
     
