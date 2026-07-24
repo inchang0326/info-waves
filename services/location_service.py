@@ -158,25 +158,23 @@ _disk_cache = PersistentLocationCache()
 
 @functools.lru_cache(maxsize=1024)
 def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float = 0.0, lon_round: float = 0.0) -> Tuple[Dict[str, str], ...]:
-    cache_key = f"{neighborhood}:{brand}:{lat_round}:{lon_round}"
+    cache_key = f"v2:{neighborhood}:{brand}:{lat_round}:{lon_round}"
     cached_res = _disk_cache.get(cache_key)
     if cached_res is not None:
         return cached_res
-    queries = []
-    if neighborhood:
-        queries.append(f"{neighborhood} {brand}")
-        base_dong = re.sub(r"\d+동$", "동", neighborhood)
-        if base_dong and base_dong != neighborhood:
-            queries.append(f"{base_dong} {brand}")
-        short_name = re.sub(r"동$", "", base_dong)
-        if short_name and short_name != base_dong:
-            queries.append(f"{short_name} {brand}")
 
-    # Fallback 1: Resolve neighborhood via 4-tier geocoding if neighborhood is empty
-    if not queries and (lat_round and lon_round):
-        resolved_nb = _cached_get_neighborhood(lat_round, lon_round)
-        if resolved_nb:
-            neighborhood = resolved_nb
+    # Primary strategy: When coordinates (lat_round, lon_round) are present,
+    # searching `brand` directly centered at (x, y) returns ALL nearby stores sorted by distance.
+    if lat_round and lon_round:
+        queries = [brand]
+        if neighborhood:
+            queries.append(f"{neighborhood} {brand}")
+            base_dong = re.sub(r"\d+동$", "동", neighborhood)
+            if base_dong and base_dong != neighborhood:
+                queries.append(f"{base_dong} {brand}")
+    else:
+        queries = []
+        if neighborhood:
             queries.append(f"{neighborhood} {brand}")
             base_dong = re.sub(r"\d+동$", "동", neighborhood)
             if base_dong and base_dong != neighborhood:
@@ -185,21 +183,12 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
             if short_name and short_name != base_dong:
                 queries.append(f"{short_name} {brand}")
 
-    # Fallback 2: Extract location region tokens from BigDataCloud API if neighborhood is still empty
+    # Fallback 1: Resolve neighborhood via 4-tier geocoding if neighborhood is empty
     if not queries and (lat_round and lon_round):
-        try:
-            url_bdc = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat_round}&longitude={lon_round}&localityLanguage=ko"
-            resp_bdc = _session.get(url_bdc, timeout=3)
-            if resp_bdc.status_code == 200:
-                data_bdc = resp_bdc.json()
-                loc = data_bdc.get("locality") or data_bdc.get("city") or data_bdc.get("principalSubdivision")
-                if loc:
-                    queries.append(f"{loc} {brand}")
-                    m_dong = re.search(r'([가-힣]+(?:동|읍|면))', loc)
-                    if m_dong and m_dong.group(1) != loc:
-                        queries.append(f"{m_dong.group(1)} {brand}")
-        except Exception:
-            pass
+        resolved_nb = _cached_get_neighborhood(lat_round, lon_round)
+        if resolved_nb:
+            neighborhood = resolved_nb
+            queries.append(f"{neighborhood} {brand}")
 
     if not queries:
         queries = [brand]
@@ -244,8 +233,6 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
             queries = [f"{neighborhood} AK플라자", "AK플라자 팝업스토어"]
         else:
             queries = ["AK플라자 팝업스토어"]
-    else:
-        queries.append(brand)
 
     headers = {
         'Referer': 'https://map.kakao.com/',
