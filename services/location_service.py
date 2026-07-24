@@ -172,28 +172,32 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
         if short_name and short_name != base_dong:
             queries.append(f"{short_name} {brand}")
 
-    # Fallback: Extract location region tokens from Kakao API if neighborhood is empty
+    # Fallback 1: Resolve neighborhood via 4-tier geocoding if neighborhood is empty
+    if not queries and (lat_round and lon_round):
+        resolved_nb = _cached_get_neighborhood(lat_round, lon_round)
+        if resolved_nb:
+            neighborhood = resolved_nb
+            queries.append(f"{neighborhood} {brand}")
+            base_dong = re.sub(r"\d+동$", "동", neighborhood)
+            if base_dong and base_dong != neighborhood:
+                queries.append(f"{base_dong} {brand}")
+            short_name = re.sub(r"동$", "", base_dong)
+            if short_name and short_name != base_dong:
+                queries.append(f"{short_name} {brand}")
+
+    # Fallback 2: Extract location region tokens from BigDataCloud API if neighborhood is still empty
     if not queries and (lat_round and lon_round):
         try:
-            url_k = f"https://search.map.kakao.com/mapsearch/map.daum?callback=jQuery_&q={lon_round},{lat_round}&page=1&msFlag=A&sort=0"
-            headers_k = {'Referer': 'https://map.kakao.com/', 'User-Agent': 'Mozilla/5.0'}
-            resp_k = _session.get(url_k, headers=headers_k, timeout=3)
-            if resp_k.status_code == 200:
-                text_k = resp_k.text
-                if '(' in text_k and ')' in text_k:
-                    text_k = text_k[text_k.index('(')+1:text_k.rindex(')')]
-                data_k = json.loads(text_k)
-                places_k = data_k.get('place', [])
-                if places_k:
-                    k_addr = places_k[0].get('address', '')
-                    m_dongs = re.findall(r'([가-힣]{2,}(?:동|시|구|읍|면))', k_addr)
-                    for d in m_dongs:
-                        q_str = f"{d} {brand}"
-                        if q_str not in queries:
-                            queries.append(q_str)
-                        short_d = re.sub(r"(동|시|구|읍|면)$", "", d)
-                        if short_d and f"{short_d} {brand}" not in queries:
-                            queries.append(f"{short_d} {brand}")
+            url_bdc = f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat_round}&longitude={lon_round}&localityLanguage=ko"
+            resp_bdc = _session.get(url_bdc, timeout=3)
+            if resp_bdc.status_code == 200:
+                data_bdc = resp_bdc.json()
+                loc = data_bdc.get("locality") or data_bdc.get("city") or data_bdc.get("principalSubdivision")
+                if loc:
+                    queries.append(f"{loc} {brand}")
+                    m_dong = re.search(r'([가-힣]+(?:동|읍|면))', loc)
+                    if m_dong and m_dong.group(1) != loc:
+                        queries.append(f"{m_dong.group(1)} {brand}")
         except Exception:
             pass
 
