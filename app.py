@@ -997,7 +997,7 @@ if curr_view == "내 주변 맞춤 혜택":
                     if key not in grouped_items: grouped_items[key] = []
                     grouped_items[key].append(item)
                     
-                is_expanded = any(k in cat for k in ["팝업", "외식", "편의점", "거지맵", "가성비"])
+                is_expanded = True
                 with st.expander(format_expander_title(cat, len(grouped_items)), expanded=is_expanded):
                     for (brand, title, link), branch_items in grouped_items.items():
                         card = generate_card_html(brand, title, link, branch_items)

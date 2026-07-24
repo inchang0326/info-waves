@@ -418,11 +418,24 @@ class LocationService:
                 text = text[text.index('(')+1:text.rindex(')')]
             data = json.loads(text)
             places = data.get('place', [])
-            for p in places:
-                p_lat = p.get("lat")
-                p_lon = p.get("lon")
+            
+            selected_place = None
+            if places:
+                # Disambiguation: Prefer metropolitan subway stations over rural railway stops
+                if "역" in clean_kw:
+                    for p in places:
+                        addr = p.get("address", "") + " " + p.get("new_address", "")
+                        name = p.get("name", "")
+                        if any(m in name or m in addr for m in ["신분당선", "지하철", "전철", "수도권", "서울", "경기", "인천", "부산", "대구", "대전", "광주"]):
+                            selected_place = p
+                            break
+                if not selected_place:
+                    selected_place = places[0]
+
+                p_lat = selected_place.get("lat")
+                p_lon = selected_place.get("lon")
                 if p_lat and p_lon:
-                    logger.info(f"Kakao Web Search Success for '{clean_kw}': {p_lat}, {p_lon}")
+                    logger.info(f"Kakao Web Search Success for '{clean_kw}': {p_lat}, {p_lon} ({selected_place.get('name')})")
                     return float(p_lat), float(p_lon)
         except Exception as e:
             logger.warning(f"Kakao Web Search failed for '{clean_kw}': {e}")
