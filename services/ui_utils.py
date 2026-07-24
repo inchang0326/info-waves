@@ -486,9 +486,9 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
     b_lower = str(brand or "").lower()
     c_lower = str(effective_cat or "").lower()
     
-    # 0. GuziMap (Beggar Map) Cheap Eatery
+    # 0. GuziMap (Beggar Map) Cheap Eatery - Highly visible vibrant lightgreen pin with darkgreen icon
     if "거지맵" in b_lower or "거지맵" in c_lower or "가성비" in c_lower:
-        return {"color": "darkgreen", "icon": "cutlery", "icon_color": "white", "prefix": "fa"}
+        return {"color": "lightgreen", "icon": "cutlery", "icon_color": "#064E3B", "prefix": "fa"}
 
     # 1. Pop-up Store & Exhibition / Event
     if "팝업" in b_lower or "팝업" in c_lower or "전시" in c_lower or "팝플리" in b_lower or "팝가" in b_lower or "헤이팝" in b_lower or ("더현대" in b_lower and "아울렛" not in b_lower):
