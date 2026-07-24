@@ -952,6 +952,7 @@ if curr_view == "내 주변 맞춤 혜택":
             
             with st.spinner(""):
                 try:
+                    st.cache_data.clear()
                     st.session_state["_last_searched_key"] = searched_key
                     st.session_state["local_results"] = fetch_local_alerts(c_lat, c_lon, global_results, radius_km_val)
                     st.session_state["_local_results_ver"] = st.session_state.get("_local_results_ver", 0) + 1
