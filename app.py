@@ -763,15 +763,8 @@ def handle_search():
             st.session_state["data_view"] = "내 주변 맞춤 혜택"
             st.session_state["map_click_disabled"] = False
             st.session_state.pop("_search_error", None)
-            
-            radius_km_val = st.session_state.get("radius_val", 3.0)
-            searched_key = (round(float(s_lat), 5), round(float(s_lon), 5), round(float(radius_km_val), 2))
-            try:
-                st.session_state["_last_searched_key"] = searched_key
-                st.session_state["local_results"] = fetch_local_alerts(s_lat, s_lon, global_results, radius_km_val)
-                st.session_state["_local_results_ver"] = st.session_state.get("_local_results_ver", 0) + 1
-            except Exception as e:
-                logger.error(f"Automatic local alerts search failed for '{sq}': {e}")
+            # Require pressing the '탐색' button to load benefits list for searched location
+            st.session_state.pop("local_results", None)
             st.rerun()
         else:
             err_msg = f"'{sq}'의 위치를 찾을 수 없습니다."

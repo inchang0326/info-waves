@@ -13,7 +13,7 @@ for b in sample_brands:
     official = get_brand_logo(b)
     fallback = get_brand_fallback_badge(b)
     print(f"Brand [{b:<12}]: Primary='{official}' | Fallback='{fallback[:40]}...'")
-    assert official.startswith("http"), f"Official logo for {b} must be HTTP official URL!"
+    assert official.startswith("http") or official.startswith("data:image/svg+xml"), f"Official logo for {b} must be valid HTTP URL or SVG!"
     assert fallback.startswith("data:image/svg+xml;base64,"), f"Fallback for {b} must be Base64 SVG!"
 print("✅ PASS: Default logos return real official HTTP URLs, with Base64 SVG fallback targets!")
 

@@ -15,6 +15,7 @@ def test_haversine_distance_calculation():
 
 def test_get_neighborhood_fallback_on_exception():
     """역지오코딩 API 예외 발생 시 다른 지역(여의도동 등)으로 오염되지 않고 안전하게 빈 문자열('')로 Fallback 되는지 검증합니다."""
+    _cached_get_neighborhood.cache_clear()
     with patch("services.location_service._session.get") as mock_get:
         mock_get.side_effect = Exception("OpenStreetMap Network Timeout Error")
         result = _cached_get_neighborhood(0.001, 0.001)
@@ -25,6 +26,7 @@ def test_search_nearby_brand_filtering():
     이마트 검색 시 '24' / '에브리데이' 브랜드가 거르고,
     GS25 검색 시 '수퍼' 브랜드가 포함된 상호명이 제외되는 필터링 로직을 원자 단위로 검증합니다.
     """
+    _cached_search_nearby_brand.cache_clear()
     fake_json_text = 'jQuery_({"place": [{"name": "이마트 산본점", "address": "경기도 군포시", "lat": "37.360", "lon": "126.928"}, {"name": "이마트24 산본역점", "address": "경기도 군포시", "lat": "37.361", "lon": "126.929"}, {"name": "이마트 에브리데이 산본점", "address": "경기도 군포시", "lat": "37.362", "lon": "126.930"}]})'
     
     with patch("services.location_service._session.get") as mock_get:

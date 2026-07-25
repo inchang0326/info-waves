@@ -1,3 +1,5 @@
+import os
+import sqlite3
 import requests
 import json
 import math
@@ -18,6 +20,15 @@ _adapter = HTTPAdapter(pool_connections=40, pool_maxsize=40)
 _session.mount("http://", _adapter)
 _session.mount("https://", _adapter)
 
+def _calc_dist_fast(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    R = 6371.0
+    dLat = math.radians(lat2 - lat1)
+    dLon = math.radians(lon2 - lon1)
+    a = (math.sin(dLat / 2)**2 + 
+         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dLon / 2)**2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
+
 @functools.lru_cache(maxsize=256)
 def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
     # Tier 1: Official Kakao REST API coord2regioncode (If KAKAO_API_KEY is configured)
@@ -30,7 +41,12 @@ def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
             if resp.status_code == 200:
                 docs = resp.json().get("documents", [])
                 if docs:
-                    region = docs[0].get("region_3depth_name") or docs[0].get("region_2depth_name")
+                    c2 = docs[0].get("region_2depth_name", "").strip()
+                    c3 = docs[0].get("region_3depth_name", "").strip()
+                    if c2 and c3:
+                        region = f"{c2} {c3}"
+                    else:
+                        region = c3 or c2
                     if region:
                         logger.info(f"Kakao Reverse Geocoding: {lat_round}, {lon_round} -> {region}")
                         return region
@@ -54,7 +70,12 @@ def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
         if resp.status_code == 200:
             data = resp.json()
             address = data.get("address", {})
-            neighborhood = address.get('quarter') or address.get('suburb') or address.get('city_district') or address.get('borough') or address.get('town') or address.get('city', '')
+            city = address.get('city') or address.get('county') or address.get('province') or address.get('state') or ''
+            dong = address.get('quarter') or address.get('suburb') or address.get('town') or address.get('village') or address.get('neighbourhood') or ''
+            if city and dong:
+                neighborhood = f"{city} {dong}"
+            else:
+                neighborhood = dong or city or address.get('city_district') or address.get('borough', '')
             if neighborhood:
                 logger.info(f"OpenStreetMap Reverse Geocoding: {lat_round}, {lon_round} -> {neighborhood}")
                 return neighborhood
@@ -69,10 +90,15 @@ def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
         resp_bdc = _session.get(url_bdc, timeout=4)
         if resp_bdc.status_code == 200:
             data_bdc = resp_bdc.json()
-            locality = data_bdc.get("locality") or data_bdc.get("city") or data_bdc.get("principalSubdivision")
-            if locality:
-                m_dong = re.search(r'([가-힣]+(?:동|읍|면))', locality)
-                res_neighborhood = m_dong.group(1) if m_dong else locality
+            city = data_bdc.get("city") or data_bdc.get("principalSubdivision") or ""
+            locality = data_bdc.get("locality") or ""
+            if city and locality:
+                res_neighborhood = f"{city} {locality}"
+            else:
+                locality_val = locality or city
+                m_dong = re.search(r'([가-힣]+(?:동|읍|면))', locality_val)
+                res_neighborhood = m_dong.group(1) if m_dong else locality_val
+            if res_neighborhood:
                 logger.info(f"BigDataCloud Reverse Geocoding: {lat_round}, {lon_round} -> {res_neighborhood}")
                 return res_neighborhood
     except Exception as e:
@@ -91,6 +117,11 @@ def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
             places_k = data_k.get('place', [])
             for p in places_k:
                 k_addr = p.get('address', '')
+                m_match = re.search(r'([가-힣]+(?:시|군|구))\s+([가-힣\d]+(?:동|읍|면))', k_addr)
+                if m_match:
+                    res_k = f"{m_match.group(1)} {m_match.group(2)}"
+                    logger.info(f"Kakao Place Reverse Geocoding: {lat_round}, {lon_round} -> {res_k}")
+                    return res_k
                 m_dong = re.search(r'([가-힣]+(?:동|읍|면))', k_addr)
                 if m_dong:
                     logger.info(f"Kakao Place Reverse Geocoding: {lat_round}, {lon_round} -> {m_dong.group(1)}")
@@ -100,14 +131,15 @@ def _cached_get_neighborhood(lat_round: float, lon_round: float) -> str:
 
     return ""
 
-import os
-import sqlite3
-
 class PersistentLocationCache:
     def __init__(self, db_path: str = "data/location_cache.sqlite"):
         self.db_path = db_path
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-        self._init_db()
+        self._mem_cache = {}
+        try:
+            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+            self._init_db()
+        except Exception:
+            pass
 
     def _get_connection(self):
         conn = sqlite3.connect(self.db_path, timeout=10)
@@ -124,13 +156,14 @@ class PersistentLocationCache:
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     );
                 """)
-                # Purge any poisoned cache entries generated by the old hardcoded '여의도동' fallback
                 conn.execute("DELETE FROM location_cache WHERE cache_key LIKE '여의도동:%' AND cache_key NOT LIKE '%:37.52%' AND cache_key NOT LIKE '%:37.53%';")
                 conn.commit()
-        except Exception as e:
-            logger.warning(f"Failed to initialize SQLite location cache: {e}")
+        except Exception:
+            pass
 
     def get(self, cache_key: str) -> Tuple[Dict[str, str], ...]:
+        if cache_key in self._mem_cache:
+            return self._mem_cache[cache_key]
         try:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
@@ -138,12 +171,16 @@ class PersistentLocationCache:
                 row = cursor.fetchone()
                 if row:
                     data = json.loads(row[0])
-                    return tuple(data)
-        except Exception as e:
-            logger.warning(f"SQLite cache get error: {e}")
+                    res = tuple(data)
+                    self._mem_cache[cache_key] = res
+                    return res
+        except Exception:
+            pass
         return None
 
     def put(self, cache_key: str, data: List[Dict[str, str]]):
+        res = tuple(data)
+        self._mem_cache[cache_key] = res
         try:
             with self._get_connection() as conn:
                 conn.execute(
@@ -151,14 +188,14 @@ class PersistentLocationCache:
                     (cache_key, json.dumps(data, ensure_ascii=False))
                 )
                 conn.commit()
-        except Exception as e:
-            logger.warning(f"SQLite cache put error: {e}")
+        except Exception:
+            pass
 
 _disk_cache = PersistentLocationCache()
 
 @functools.lru_cache(maxsize=1024)
 def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float = 0.0, lon_round: float = 0.0) -> Tuple[Dict[str, str], ...]:
-    cache_key = f"v3:{neighborhood}:{brand}:{lat_round}:{lon_round}"
+    cache_key = f"v4:{neighborhood}:{brand}:{lat_round}:{lon_round}"
     cached_res = _disk_cache.get(cache_key)
     if cached_res is not None:
         return cached_res
@@ -166,12 +203,23 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
     queries = []
     if neighborhood:
         queries.append(f"{neighborhood} {brand}")
-        base_dong = re.sub(r"\d+동$", "동", neighborhood)
-        if base_dong and base_dong != neighborhood:
-            queries.append(f"{base_dong} {brand}")
-        short_name = re.sub(r"동$", "", base_dong)
-        if short_name and short_name != base_dong:
-            queries.append(f"{short_name} {brand}")
+        parts = neighborhood.split()
+        if len(parts) >= 2:
+            city_part = parts[0]
+            dong_part = parts[-1]
+            queries.append(f"{city_part} {brand}")
+            queries.append(f"{dong_part} {brand}")
+            base_dong = re.sub(r"\d+동$", "동", dong_part)
+            if base_dong and base_dong != dong_part:
+                queries.append(f"{city_part} {base_dong} {brand}")
+                queries.append(f"{base_dong} {brand}")
+        else:
+            base_dong = re.sub(r"\d+동$", "동", neighborhood)
+            if base_dong and base_dong != neighborhood:
+                queries.append(f"{base_dong} {brand}")
+            short_name = re.sub(r"동$", "", base_dong)
+            if short_name and short_name != base_dong:
+                queries.append(f"{short_name} {brand}")
 
     queries.append(brand)
 
@@ -236,23 +284,30 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
                 continue
             
             for p in places:
-                p_lat, p_lon = p.get("lat"), p.get("lon")
+                p_lat_str, p_lon_str = p.get("lat"), p.get("lon")
                 p_name = p.get("name", "")
                 
                 if brand == "이마트" and ("24" in p_name or "에브리데이" in p_name): continue
                 if brand == "GS25" and "수퍼" in p_name: continue
                 
-                key = p.get("confirmid") or f"{p_name}_{p_lat}_{p_lon}"
-                if key not in seen and p_lat and p_lon:
-                    seen.add(key)
-                    results.append({
-                        "name": p_name,
-                        "address": p.get("address", ""),
-                        "road_address": p.get("new_address", ""),
-                        "lat": float(p_lat),
-                        "lon": float(p_lon)
-                    })
-                    if len(results) >= 100: break
+                if p_lat_str and p_lon_str:
+                    p_lat, p_lon = float(p_lat_str), float(p_lon_str)
+                    if lat_round and lon_round:
+                        d_check = _calc_dist_fast(lat_round, lon_round, p_lat, p_lon)
+                        if d_check > 15.0:
+                            continue
+                    
+                    key = p.get("confirmid") or f"{p_name}_{p_lat}_{p_lon}"
+                    if key not in seen:
+                        seen.add(key)
+                        results.append({
+                            "name": p_name,
+                            "address": p.get("address", ""),
+                            "road_address": p.get("new_address", ""),
+                            "lat": p_lat,
+                            "lon": p_lon
+                        })
+                        if len(results) >= 100: break
             
             # If page 1 had 15 results, fetch pages 2 and 3 for full coverage
             if len(places) >= 15 and len(results) < 100:
@@ -266,21 +321,27 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
                     places_p = data_p.get('place', [])
                     if not places_p: break
                     for p in places_p:
-                        p_lat, p_lon = p.get("lat"), p.get("lon")
+                        p_lat_str, p_lon_str = p.get("lat"), p.get("lon")
                         p_name = p.get("name", "")
                         if brand == "이마트" and ("24" in p_name or "에브리데이" in p_name): continue
                         if brand == "GS25" and "수퍼" in p_name: continue
-                        key = p.get("confirmid") or f"{p_name}_{p_lat}_{p_lon}"
-                        if key not in seen and p_lat and p_lon:
-                            seen.add(key)
-                            results.append({
-                                "name": p_name,
-                                "address": p.get("address", ""),
-                                "road_address": p.get("new_address", ""),
-                                "lat": float(p_lat),
-                                "lon": float(p_lon)
-                            })
-                            if len(results) >= 100: break
+                        if p_lat_str and p_lon_str:
+                            p_lat, p_lon = float(p_lat_str), float(p_lon_str)
+                            if lat_round and lon_round:
+                                d_check = _calc_dist_fast(lat_round, lon_round, p_lat, p_lon)
+                                if d_check > 15.0:
+                                    continue
+                            key = p.get("confirmid") or f"{p_name}_{p_lat}_{p_lon}"
+                            if key not in seen:
+                                seen.add(key)
+                                results.append({
+                                    "name": p_name,
+                                    "address": p.get("address", ""),
+                                    "road_address": p.get("new_address", ""),
+                                    "lat": p_lat,
+                                    "lon": p_lon
+                                })
+                                if len(results) >= 100: break
                     if len(results) >= 100: break
 
             # SMART EARLY EXIT: Stop redundant query fallbacks once at least 15 stores are found for this brand

@@ -32,11 +32,15 @@ def setup_logger(name: str) -> logging.Logger:
         logger.addHandler(ch)
 
         # 2. File Handler (DEBUG and above, rotating 5MB max, 3 backups)
-        fh = logging.handlers.RotatingFileHandler(
-            LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=3, encoding='utf-8'
-        )
-        fh.setLevel(logging.DEBUG)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
+        try:
+            fh = logging.handlers.RotatingFileHandler(
+                LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=3, encoding='utf-8'
+            )
+            fh.setLevel(logging.DEBUG)
+            fh.setFormatter(formatter)
+            logger.addHandler(fh)
+        except Exception:
+            pass
 
     return logger
+
