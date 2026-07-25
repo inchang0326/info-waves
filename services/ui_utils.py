@@ -4,173 +4,67 @@ logger = setup_logger(__name__)
 
 def get_brand_logo(brand_name: str) -> str:
     """
-    Returns the real official brand logo URL (Favicon / CDN) if available online.
-    Falls back to custom vibrant SVG emblems only when official online logos are unavailable or blocked by WAF.
+    Returns high-definition vector SVG Base64 badges for all major Korean brands.
+    Guarantees 100% loading reliability with 0ms network latency across all browsers and WAF environments.
     """
     import urllib.parse
+    import base64
+    import re
+
     if not brand_name or not isinstance(brand_name, str):
-        return "https://www.google.com/s2/favicons?domain=google.com&sz=128"
+        display_text = "?"
+    else:
+        brand_clean = brand_name.strip()
+        display_text = brand_clean[:2] if len(brand_clean) >= 2 else brand_clean
 
-    brand_clean = brand_name.strip()
-
-    # Tier 1: High-Definition Verified Real Official Brand Logos / CDNs / Domain Favicons
-    official_logos = {
-        # 편의점
-        "CU": "https://www.google.com/s2/favicons?domain=cu.bgfretail.com&sz=128",
-        "씨유": "https://www.google.com/s2/favicons?domain=cu.bgfretail.com&sz=128",
-        "GS25": "https://www.google.com/s2/favicons?domain=gs25.gsretail.com&sz=128",
-        "지에스": "https://www.google.com/s2/favicons?domain=gs25.gsretail.com&sz=128",
-
-        # 패스트푸드 & 피자 & 치킨
-        "맥도날드": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/mcdonalds.svg",
-        "McDonald": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/mcdonalds.svg",
-        "버거킹": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/burgerking.svg",
-        "Burger King": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/burgerking.svg",
-        "KFC": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/kfc.svg",
-        "케이에프씨": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/kfc.svg",
-        "롯데리아": "https://www.google.com/s2/favicons?domain=lotteeatz.com&sz=128",
-        "Lotteria": "https://www.google.com/s2/favicons?domain=lotteeatz.com&sz=128",
-        "도미노피자": "https://www.google.com/s2/favicons?domain=dominos.co.kr&sz=128",
-        "도미노": "https://www.google.com/s2/favicons?domain=dominos.co.kr&sz=128",
-        "피자헛": "https://www.google.com/s2/favicons?domain=pizzahut.co.kr&sz=128",
-        "교촌치킨": "https://www.google.com/s2/favicons?domain=kyochon.com&sz=128",
-        "교촌": "https://www.google.com/s2/favicons?domain=kyochon.com&sz=128",
-        "BBQ": "https://www.google.com/s2/favicons?domain=bbq.co.kr&sz=128",
-        "BHC": "https://www.google.com/s2/favicons?domain=bhc.co.kr&sz=128",
-        "굽네치킨": "https://www.google.com/s2/favicons?domain=goobne.co.kr&sz=128",
-        "파파존스": "https://www.google.com/s2/favicons?domain=papajohns.com&sz=128",
-
-        # 카페 / 베이커리 / 디저트
-        "스타벅스": "https://www.google.com/s2/favicons?domain=starbucks.co.kr&sz=128",
-        "Starbucks": "https://www.google.com/s2/favicons?domain=starbucks.co.kr&sz=128",
-        "투썸플레이스": "https://www.google.com/s2/favicons?domain=twosome.co.kr&sz=128",
-        "투썸": "https://www.google.com/s2/favicons?domain=twosome.co.kr&sz=128",
-        "이디야커피": "https://www.google.com/s2/favicons?domain=ediya.com&sz=128",
-        "이디야": "https://www.google.com/s2/favicons?domain=ediya.com&sz=128",
-        "메가커피": "https://www.google.com/s2/favicons?domain=mega-mgccoffee.com&sz=128",
-        "메가MGC": "https://www.google.com/s2/favicons?domain=mega-mgccoffee.com&sz=128",
-        "컴포즈커피": "https://www.google.com/s2/favicons?domain=composecoffee.com&sz=128",
-        "컴포즈": "https://www.google.com/s2/favicons?domain=composecoffee.com&sz=128",
-        "빽다방": "https://www.google.com/s2/favicons?domain=paikdabang.com&sz=128",
-        "파리바게뜨": "https://www.google.com/s2/favicons?domain=paris.co.kr&sz=128",
-        "파리바게트": "https://www.google.com/s2/favicons?domain=paris.co.kr&sz=128",
-        "파리크라상": "https://www.google.com/s2/favicons?domain=paris.co.kr&sz=128",
-        "뚜레쥬르": "https://www.google.com/s2/favicons?domain=tlj.co.kr&sz=128",
-        "배스킨라빈스": "https://www.google.com/s2/favicons?domain=baskinrobbins.co.kr&sz=128",
-
-        # H&B / 유통 / 의류 / 영화관 / IT
-        "올리브영": "https://www.google.com/s2/favicons?domain=oliveyoung.co.kr&sz=128",
-        "Olive Young": "https://www.google.com/s2/favicons?domain=oliveyoung.co.kr&sz=128",
-        "홈플러스": "https://www.google.com/s2/favicons?domain=homeplus.co.kr&sz=128",
-        "Homeplus": "https://www.google.com/s2/favicons?domain=homeplus.co.kr&sz=128",
-        "이마트": "https://www.google.com/s2/favicons?domain=emart.ssg.com&sz=128",
-        "코스트코": "https://www.google.com/s2/favicons?domain=costco.co.kr&sz=128",
-        "신세계": "https://www.google.com/s2/favicons?domain=shinsegae.com&sz=128",
-        "현대백화점": "https://www.google.com/s2/favicons?domain=ehyundai.com&sz=128",
-        "롯데백화점": "https://www.google.com/s2/favicons?domain=lotteshopping.com&sz=128",
-        "스타필드": "https://www.google.com/s2/favicons?domain=starfield.co.kr&sz=128",
-        "유니클로": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/uniqlo.svg",
-        "Uniqlo": "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/uniqlo.svg",
-        "탑텐": "https://www.google.com/s2/favicons?domain=topten10mall.com&sz=128",
-        "CGV": "https://www.google.com/s2/favicons?domain=cgv.co.kr&sz=128",
-        "롯데시네마": "https://www.google.com/s2/favicons?domain=lottecinema.co.kr&sz=128",
-        "루리웹": "https://www.google.com/s2/favicons?domain=ruliweb.com&sz=128",
-        "에펨코리아": "https://www.google.com/s2/favicons?domain=fmkorea.com&sz=128",
-        # 통신사 / 금융 / 커뮤니티
-        "SKT": "https://www.google.com/s2/favicons?domain=tworld.co.kr&sz=128",
-        "KT": "https://www.google.com/s2/favicons?domain=kt.com&sz=128",
-        "유플러스": "https://www.google.com/s2/favicons?domain=lguplus.com&sz=128",
-        "유플투쁠": "https://www.google.com/s2/favicons?domain=lguplus.com&sz=128",
-        "유플": "https://www.google.com/s2/favicons?domain=lguplus.com&sz=128",
-        "토스": "https://www.google.com/s2/favicons?domain=toss.im&sz=128",
-        "네이버": "https://www.google.com/s2/favicons?domain=naver.com&sz=128",
-        "카카오": "https://www.google.com/s2/favicons?domain=kakaocorp.com&sz=128",
-        "에펨코리아": "https://www.google.com/s2/favicons?domain=fmkorea.com&sz=128",
-        "뽐뿌": "https://www.google.com/s2/favicons?domain=ppomppu.co.kr&sz=128",
-        "퀘이사존": "https://www.google.com/s2/favicons?domain=quasarzone.com&sz=128",
-        "어미새": "https://www.google.com/s2/favicons?domain=eomisae.co.kr&sz=128",
-        "쿨엔조이": "https://www.google.com/s2/favicons?domain=coolenjoy.net&sz=128",
-
-        # 추가 브랜드 로고
-        "서브웨이": "https://www.google.com/s2/favicons?domain=subway.co.kr&sz=128",
-        "써브웨이": "https://www.google.com/s2/favicons?domain=subway.co.kr&sz=128",
-        "노브랜드버거": "https://www.google.com/s2/favicons?domain=shinsegaefood.com&sz=128",
-        "노브랜드": "https://www.google.com/s2/favicons?domain=shinsegaefood.com&sz=128",
-        "프랭크버거": "https://www.google.com/s2/favicons?domain=frankburger.co.kr&sz=128",
-        "60계치킨": "https://www.google.com/s2/favicons?domain=60chicken.co.kr&sz=128",
-        "노랑통닭": "https://www.google.com/s2/favicons?domain=norangtongdak.co.kr&sz=128",
-        "천년닭강정": "https://www.google.com/s2/favicons?domain=1000dak.co.kr&sz=128",
-        "피자알볼로": "https://www.google.com/s2/favicons?domain=pizzaalvolo.co.kr&sz=128",
-        "7번가피자": "https://www.google.com/s2/favicons?domain=7thpizza.com&sz=128",
-        "동대문엽기떡볶이": "https://www.google.com/s2/favicons?domain=yupdduk.com&sz=128",
-        "엽기떡볶이": "https://www.google.com/s2/favicons?domain=yupdduk.com&sz=128",
-        "한솥도시락": "https://www.google.com/s2/favicons?domain=hsd.co.kr&sz=128",
-        "한솥": "https://www.google.com/s2/favicons?domain=hsd.co.kr&sz=128",
-        "두끼": "https://www.google.com/s2/favicons?domain=dookki.co.kr&sz=128",
-        "역전할머니맥주": "https://www.google.com/s2/favicons?domain=yeokjeonhalmae.com&sz=128",
-        "역전할머니": "https://www.google.com/s2/favicons?domain=yeokjeonhalmae.com&sz=128",
-        "본죽": "https://www.google.com/s2/favicons?domain=bonif.co.kr&sz=128",
-        "신전떡볶이": "https://www.google.com/s2/favicons?domain=sinjeon.co.kr&sz=128",
-        "홍콩반점0410": "https://www.google.com/s2/favicons?domain=theborn.co.kr&sz=128",
-        "홍콩반점": "https://www.google.com/s2/favicons?domain=theborn.co.kr&sz=128",
-        "원할머니보쌈": "https://www.google.com/s2/favicons?domain=bossam.co.kr&sz=128",
-        "더벤티": "https://www.google.com/s2/favicons?domain=theventi.co.kr&sz=128",
-        "공차": "https://www.google.com/s2/favicons?domain=gong-cha.co.kr&sz=128",
-        "할리스": "https://www.google.com/s2/favicons?domain=hollys.co.kr&sz=128",
-        "던킨": "https://www.google.com/s2/favicons?domain=dunkindonuts.co.kr&sz=128",
-        "크리스피크림": "https://www.google.com/s2/favicons?domain=lotteeatz.com&sz=128",
-        "요아정": "https://www.google.com/s2/favicons?domain=yoajung.co.kr&sz=128",
-        "설빙": "https://www.google.com/s2/favicons?domain=sulbing.com&sz=128",
-        "폴바셋": "https://www.google.com/s2/favicons?domain=baristapaulbassett.co.kr&sz=128",
-        "아티제": "https://www.google.com/s2/favicons?domain=cafeartisee.com&sz=128",
-        "롯데마트": "https://www.google.com/s2/favicons?domain=lottemart.com&sz=128",
-        "GS더프레시": "https://www.google.com/s2/favicons?domain=gsretail.com&sz=128",
-        "이마트에브리데이": "https://www.google.com/s2/favicons?domain=emarteveryday.co.kr&sz=128",
-        "무인양품": "https://www.google.com/s2/favicons?domain=muji.kr&sz=128",
-        "모던하우스": "https://www.google.com/s2/favicons?domain=modernhousemall.com&sz=128",
-        "아트박스": "https://www.google.com/s2/favicons?domain=poom.co.kr&sz=128",
-        "스파오": "https://www.google.com/s2/favicons?domain=spao.com&sz=128",
-        "ABC마트": "https://www.google.com/s2/favicons?domain=abcmart.a-rt.com&sz=128",
-        "무신사": "https://www.google.com/s2/favicons?domain=musinsa.com&sz=128",
-        "롯데월드": "https://www.google.com/s2/favicons?domain=lotteworld.com&sz=128",
-        "에버랜드": "https://www.google.com/s2/favicons?domain=everland.com&sz=128",
-        "쏘카": "https://www.google.com/s2/favicons?domain=socar.kr&sz=128",
-        "GS칼텍스": "https://www.google.com/s2/favicons?domain=gscaltex.com&sz=128",
-
-        # 거지맵 (가성비 식당 & 초저가 혜택)
-        "거지맵": "https://www.google.com/s2/favicons?domain=xn--v69ak0xskm.com&sz=128",
-
-        # 팝업스토어 & 전시/행사
-        "팝플리": "https://www.google.com/s2/favicons?domain=popply.co.kr&sz=128",
-        "팝가": "https://www.google.com/s2/favicons?domain=popga.co.kr&sz=128",
-        "더현대": "https://www.google.com/s2/favicons?domain=ehyundai.com&sz=128",
-        "롯데월드몰": "https://www.google.com/s2/favicons?domain=lotteshopping.com&sz=128",
-        "헤이팝": "https://www.google.com/s2/favicons?domain=heypop.kr&sz=128",
-    }
-
-    for key, logo_url in official_logos.items():
-        if key in brand_clean:
-            return logo_url
-
-    # Tier 2: Fallback Vibrant Brand SVG Badges (For brands blocked by WAF or without public CDN logos)
+    # Tier 1: Custom Vibrant Brand SVG Base64 Badges (100% Vector, Instant 0ms Load, Zero WAF/Favicon Failures)
     fallback_badges = {
+        # 편의점
+        "CU": ("CU", "#652d90", "#00a88f"),
+        "씨유": ("CU", "#652d90", "#00a88f"),
+        "GS25": ("GS25", "#007bc4", "#ffffff"),
+        "지에스": ("GS25", "#007bc4", "#ffffff"),
         "세븐일레븐": ("7E", "#047857", "#ef4444"),
         "7-Eleven": ("7E", "#047857", "#ef4444"),
         "이마트24": ("24", "#eab308", "#0f172a"),
         "이마24": ("24", "#eab308", "#0f172a"),
         "emart24": ("24", "#eab308", "#0f172a"),
-        "맘스터치": ("MT", "#d97706", "#ffffff"),
+
+        # 패스트푸드 & 버거 & 피자 & 치킨
+        "맥도날드": ("M", "#da291c", "#ffbc0d"),
+        "McDonald": ("M", "#da291c", "#ffbc0d"),
+        "버거킹": ("BK", "#d72300", "#fbe122"),
+        "Burger King": ("BK", "#d72300", "#fbe122"),
+        "KFC": ("KFC", "#e4002b", "#ffffff"),
+        "케이에프씨": ("KFC", "#e4002b", "#ffffff"),
+        "롯데리아": ("L", "#ed1c24", "#ffffff"),
         "Momstouch": ("MT", "#d97706", "#ffffff"),
-        "다이소": ("DS", "#dc2626", "#ffffff"),
-        "Daiso": ("DS", "#dc2626", "#ffffff"),
-        "메가박스": ("MB", "#312e81", "#ffffff"),
-        "Megabox": ("MB", "#312e81", "#ffffff"),
-        "엔제리너스": ("ANG", "#b45309", "#ffffff"),
-        "할리스": ("HL", "#ba1b22", "#ffffff"),
-        "Hollys": ("HL", "#ba1b22", "#ffffff"),
-        "천년닭강정": ("천년", "#ea580c", "#ffffff"),
+        "맘스터치": ("MT", "#d97706", "#ffffff"),
+        "서브웨이": ("SUB", "#008a38", "#ffc72c"),
+        "써브웨이": ("SUB", "#008a38", "#ffc72c"),
+        "노브랜드버거": ("NBB", "#ffb800", "#000000"),
+        "프랭크버거": ("FB", "#004b23", "#ffffff"),
+        "도미노피자": ("DP", "#0078ac", "#e31837"),
+        "도미노": ("DP", "#0078ac", "#e31837"),
+        "피자헛": ("PH", "#ee3124", "#ffffff"),
+        "파파존스": ("PJ", "#006738", "#ffffff"),
+        "노모어피자": ("NMP", "#ff5722", "#ffffff"),
+        "피자알볼로": ("PA", "#0055a5", "#ffffff"),
+        "7번가피자": ("7P", "#0047ba", "#ffffff"),
+        "교촌치킨": ("교촌", "#c69214", "#ffffff"),
+        "교촌": ("교촌", "#c69214", "#ffffff"),
+        "BBQ": ("BBQ", "#d32f2f", "#ffffff"),
+        "BHC": ("bhc", "#ff8c00", "#ffffff"),
+        "굽네치킨": ("굽네", "#b91c1c", "#ffffff"),
+        "푸라닭": ("PRD", "#111827", "#d4af37"),
+        "가마치통닭": ("가마치", "#c2410c", "#ffffff"),
+        "자담치킨": ("자담", "#15803d", "#ffffff"),
         "60계치킨": ("60계", "#d97706", "#ffffff"),
         "60계": ("60계", "#d97706", "#ffffff"),
+        "천년닭강정": ("천년", "#ea580c", "#ffffff"),
+        "노랑통닭": ("노랑", "#eab308", "#0f172a"),
+
+        # 분식 & 한식 & 기타 외식
         "동대문엽기떡볶이": ("엽떡", "#dc2626", "#fef08a"),
         "엽기떡볶이": ("엽떡", "#dc2626", "#fef08a"),
         "한솥도시락": ("한솥", "#f97316", "#ffffff"),
@@ -178,33 +72,83 @@ def get_brand_logo(brand_name: str) -> str:
         "신전떡볶이": ("신전", "#b91c1c", "#ffffff"),
         "역전할머니맥주": ("역전", "#ca8a04", "#ffffff"),
         "역전할머니": ("역전", "#ca8a04", "#ffffff"),
+        "본죽": ("본죽", "#9a3412", "#ffffff"),
+        "두끼": ("두끼", "#ea580c", "#ffffff"),
+        "홍콩반점": ("홍콩", "#dc2626", "#ffffff"),
+        "원할머니보쌈": ("원할머니", "#854d0e", "#ffffff"),
+
+        # 카페 / 베이커리 / 디저트
+        "스타벅스": ("스벅", "#00704a", "#ffffff"),
+        "Starbucks": ("스벅", "#00704a", "#ffffff"),
+        "투썸플레이스": ("투썸", "#111827", "#ef4444"),
+        "투썸": ("투썸", "#111827", "#ef4444"),
+        "이디야커피": ("이디야", "#00205b", "#ffffff"),
+        "이디야": ("이디야", "#00205b", "#ffffff"),
+        "메가커피": ("메가", "#fbbf24", "#1e3a8a"),
+        "메가MGC": ("메가", "#fbbf24", "#1e3a8a"),
+        "컴포즈커피": ("컴포즈", "#f59e0b", "#000000"),
+        "컴포즈": ("컴포즈", "#f59e0b", "#000000"),
+        "빽다방": ("빽다방", "#1d4ed8", "#facc15"),
+        "파리바게뜨": ("파바", "#002b49", "#ffffff"),
+        "파리바게트": ("파바", "#002b49", "#ffffff"),
+        "파리크라상": ("파리", "#0f172a", "#ffffff"),
+        "뚜레쥬르": ("TLJ", "#064e3b", "#fef08a"),
+        "배스킨라빈스": ("BR", "#ff007f", "#0099ff"),
+        "할리스": ("HL", "#ba1b22", "#ffffff"),
+        "Hollys": ("HL", "#ba1b22", "#ffffff"),
+        "공차": ("공차", "#991b1b", "#ffffff"),
+        "더벤티": ("더벤티", "#6b21a8", "#ffffff"),
+        "던킨": ("던킨", "#ff6600", "#ff0099"),
+        "크리스피크림": ("크리스피", "#047857", "#dc2626"),
+        "요아정": ("요아정", "#0284c7", "#ffffff"),
+        "설빙": ("설빙", "#78350f", "#ffffff"),
+        "폴바셋": ("폴바셋", "#18181b", "#d4af37"),
+        "아티제": ("아티제", "#451a03", "#ffffff"),
+        "우지커피": ("우지", "#16a34a", "#ffffff"),
+        "엔제리너스": ("ANG", "#b45309", "#ffffff"),
+        "매머드커피": ("매머드", "#18181b", "#ffffff"),
+
+        # H&B / 마트 / 쇼핑 / 영화관 / 테마파크
+        "올리브영": ("올영", "#70b22d", "#ffffff"),
+        "Olive Young": ("올영", "#70b22d", "#ffffff"),
+        "다이소": ("DS", "#dc2626", "#ffffff"),
+        "Daiso": ("DS", "#dc2626", "#ffffff"),
+        "이마트": ("이마트", "#ffb800", "#000000"),
+        "홈플러스": ("홈플", "#e11d48", "#ffffff"),
+        "코스트코": ("COST", "#0284c7", "#e11d48"),
         "GS더프레시": ("GS", "#059669", "#ffffff"),
+        "이마트에브리데이": ("에브리데이", "#ca8a04", "#ffffff"),
         "무인양품": ("MUJI", "#7f1d1d", "#ffffff"),
         "MUJI": ("MUJI", "#7f1d1d", "#ffffff"),
+        "모던하우스": ("모던", "#0369a1", "#ffffff"),
+        "아트박스": ("아트박스", "#e11d48", "#ffffff"),
+        "스파오": ("SPAO", "#1e3a8a", "#ffffff"),
+        "ABC마트": ("ABC", "#dc2626", "#facc15"),
+        "무신사": ("MUSINSA", "#000000", "#ffffff"),
+        "유니클로": ("UQ", "#ff0000", "#ffffff"),
+        "탑텐": ("TOPTEN", "#18181b", "#ffffff"),
+        "CGV": ("CGV", "#ed1c24", "#ffffff"),
+        "롯데시네마": ("롯데", "#dc2626", "#ffffff"),
+        "메가박스": ("MB", "#312e81", "#ffffff"),
         "롯데월드": ("LW", "#6b21a8", "#fde047"),
+        "에버랜드": ("에버", "#0284c7", "#ffffff"),
+        "쏘카": ("SOCAR", "#0284c7", "#ffffff"),
+        "GS칼텍스": ("GS칼텍스", "#059669", "#ffffff"),
     }
 
-    for key, (text, bg_color, font_color) in fallback_badges.items():
-        if key in brand_clean:
-            svg = (
-                f'<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">'
-                f'<rect width="128" height="128" rx="28" fill="{bg_color}" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>'
-                f'<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="{font_color}" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="42">{text}</text>'
-                f'</svg>'
-            )
-            import base64
-            b64_svg = base64.b64encode(svg.encode("utf-8")).decode("utf-8")
-            return f"data:image/svg+xml;base64,{b64_svg}"
+    if brand_name and isinstance(brand_name, str):
+        for key, (text, bg_color, font_color) in fallback_badges.items():
+            if key in brand_clean:
+                svg = (
+                    f'<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">'
+                    f'<rect width="128" height="128" rx="28" fill="{bg_color}" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>'
+                    f'<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="{font_color}" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="40">{text}</text>'
+                    f'</svg>'
+                )
+                b64_svg = base64.b64encode(svg.encode("utf-8")).decode("utf-8")
+                return f"data:image/svg+xml;base64,{b64_svg}"
 
-    # Tier 3: Automatic English / Alphanumeric Domain Inference
-    import re
-    eng_match = re.search(r'[a-zA-Z0-9]{3,}', brand_clean)
-    if eng_match:
-        inferred_domain = f"{eng_match.group(0).lower()}.co.kr"
-        return f"https://www.google.com/s2/favicons?domain={inferred_domain}&sz=128"
-
-    # Tier 4: Dynamic Glassmorphism SVG Badge for Unlisted Brands
-    display_text = brand_clean[:2] if len(brand_clean) >= 2 else brand_clean
+    # Tier 2: Dynamic Glassmorphism SVG Badge for Unlisted Brands
     svg_badge = (
         '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">'
         '<defs>'
@@ -217,7 +161,6 @@ def get_brand_logo(brand_name: str) -> str:
         f'<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" font-size="44">{display_text}</text>'
         '</svg>'
     )
-    import base64
     b64_badge = base64.b64encode(svg_badge.encode("utf-8")).decode("utf-8")
     return f"data:image/svg+xml;base64,{b64_badge}"
 

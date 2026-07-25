@@ -765,7 +765,9 @@ def handle_search():
             st.session_state.pop("_search_error", None)
             
             radius_km_val = st.session_state.get("radius_val", 3.0)
+            searched_key = (round(float(s_lat), 5), round(float(s_lon), 5), round(float(radius_km_val), 2))
             try:
+                st.session_state["_last_searched_key"] = searched_key
                 st.session_state["local_results"] = fetch_local_alerts(s_lat, s_lon, global_results, radius_km_val)
                 st.session_state["_local_results_ver"] = st.session_state.get("_local_results_ver", 0) + 1
             except Exception as e:
@@ -810,9 +812,14 @@ current_loc_key = (
     round(float(radius_input), 2)
 )
 
-# Pop local_results if user has not explicitly clicked "🔍 탐색" for the current coordinates/radius key
-if st.session_state.get("_last_searched_key") != current_loc_key:
-    st.session_state.pop("local_results", None)
+# Automatically fetch/synchronize local results if key changed or results are missing
+if "local_results" not in st.session_state or st.session_state.get("_last_searched_key") != current_loc_key:
+    try:
+        st.session_state["_last_searched_key"] = current_loc_key
+        st.session_state["local_results"] = fetch_local_alerts(lat_input, lon_input, global_results, radius_input)
+        st.session_state["_local_results_ver"] = st.session_state.get("_local_results_ver", 0) + 1
+    except Exception as e:
+        logger.error(f"Automatic local alerts fetch failed: {e}")
 
 # --- Main Layout ---
 if curr_view == "내 주변 맞춤 혜택":
