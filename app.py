@@ -812,14 +812,9 @@ current_loc_key = (
     round(float(radius_input), 2)
 )
 
-# Automatically fetch/synchronize local results if key changed or results are missing
-if "local_results" not in st.session_state or st.session_state.get("_last_searched_key") != current_loc_key:
-    try:
-        st.session_state["_last_searched_key"] = current_loc_key
-        st.session_state["local_results"] = fetch_local_alerts(lat_input, lon_input, global_results, radius_input)
-        st.session_state["_local_results_ver"] = st.session_state.get("_local_results_ver", 0) + 1
-    except Exception as e:
-        logger.error(f"Automatic local alerts fetch failed: {e}")
+# Synchronize local_results: pop results if current coordinates/radius key has changed without searching
+if st.session_state.get("_last_searched_key") != current_loc_key:
+    st.session_state.pop("local_results", None)
 
 # --- Main Layout ---
 if curr_view == "내 주변 맞춤 혜택":

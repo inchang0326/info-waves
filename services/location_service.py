@@ -158,41 +158,23 @@ _disk_cache = PersistentLocationCache()
 
 @functools.lru_cache(maxsize=1024)
 def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float = 0.0, lon_round: float = 0.0) -> Tuple[Dict[str, str], ...]:
-    cache_key = f"v2:{neighborhood}:{brand}:{lat_round}:{lon_round}"
+    cache_key = f"v3:{neighborhood}:{brand}:{lat_round}:{lon_round}"
     cached_res = _disk_cache.get(cache_key)
     if cached_res is not None:
         return cached_res
 
-    # Primary strategy: When coordinates (lat_round, lon_round) are present,
-    # searching `brand` directly centered at (x, y) returns ALL nearby stores sorted by distance.
-    if lat_round and lon_round:
-        queries = [brand]
-        if neighborhood:
-            queries.append(f"{neighborhood} {brand}")
-            base_dong = re.sub(r"\d+동$", "동", neighborhood)
-            if base_dong and base_dong != neighborhood:
-                queries.append(f"{base_dong} {brand}")
-    else:
-        queries = []
-        if neighborhood:
-            queries.append(f"{neighborhood} {brand}")
-            base_dong = re.sub(r"\d+동$", "동", neighborhood)
-            if base_dong and base_dong != neighborhood:
-                queries.append(f"{base_dong} {brand}")
-            short_name = re.sub(r"동$", "", base_dong)
-            if short_name and short_name != base_dong:
-                queries.append(f"{short_name} {brand}")
+    queries = []
+    if neighborhood:
+        queries.append(f"{neighborhood} {brand}")
+        base_dong = re.sub(r"\d+동$", "동", neighborhood)
+        if base_dong and base_dong != neighborhood:
+            queries.append(f"{base_dong} {brand}")
+        short_name = re.sub(r"동$", "", base_dong)
+        if short_name and short_name != base_dong:
+            queries.append(f"{short_name} {brand}")
 
-    # Fallback 1: Resolve neighborhood via 4-tier geocoding if neighborhood is empty
-    if not queries and (lat_round and lon_round):
-        resolved_nb = _cached_get_neighborhood(lat_round, lon_round)
-        if resolved_nb:
-            neighborhood = resolved_nb
-            queries.append(f"{neighborhood} {brand}")
+    queries.append(brand)
 
-    if not queries:
-        queries = [brand]
-    
     # Location-Aware Nationwide Query Mappings for Pop-up Stores & Major Chains
     if any(k in brand for k in ["팝플리", "팝가", "헤이팝", "팝업"]):
         if neighborhood:
@@ -301,8 +283,8 @@ def _cached_search_nearby_brand(neighborhood: str, brand: str, lat_round: float 
                             if len(results) >= 100: break
                     if len(results) >= 100: break
 
-            # SMART EARLY EXIT: Stop redundant query fallbacks if neighborhood stores were found
-            if len(results) > 0:
+            # SMART EARLY EXIT: Stop redundant query fallbacks once at least 15 stores are found for this brand
+            if len(results) >= 15:
                 break
 
         except Exception as e:
