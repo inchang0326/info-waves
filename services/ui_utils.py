@@ -489,13 +489,13 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
     b_lower = str(brand or "").lower()
     c_lower = str(effective_cat or "").lower()
     
-    # 0. GuziMap (Beggar Map) Cheap Eatery - Unique Lightblue Pin + White Cutlery Icon
+    # 0. GuziMap (Beggar Map) Cheap Eatery - Unique Black Pin + Yellow Cutlery Icon
     if "거지맵" in b_lower or "거지맵" in c_lower or "가성비" in c_lower:
-        return {"color": "lightblue", "icon": "cutlery", "icon_color": "black", "prefix": "fa"}
+        return {"color": "black", "icon": "cutlery", "icon_color": "yellow", "prefix": "fa"}
 
-    # 1. Pop-up Store & Exhibition / Event - Unique Black Pin + White Star Icon
+    # 1. Pop-up Store & Exhibition / Event - Unique Black Pin + Yellow Star Icon
     if "팝업" in b_lower or "팝업" in c_lower or "전시" in c_lower or "팝플리" in b_lower or "팝가" in b_lower or "헤이팝" in b_lower or ("더현대" in b_lower and "아울렛" not in b_lower):
-        return {"color": "black", "icon": "star", "icon_color": "white", "prefix": "fa"}
+        return {"color": "black", "icon": "star", "icon_color": "yellow", "prefix": "fa"}
         
     # 2. Convenience Store
     if "편의점" in c_lower or b_lower in ["cu", "gs25", "세븐일레븐", "이마트24", "씨유", "지에스25"]:
@@ -503,7 +503,7 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
         
     # 3. Department Store & Premium Outlet
     if "백화점" in c_lower or "아울렛" in c_lower or "백화점" in b_lower or "아울렛" in b_lower:
-        return {"color": "purple", "icon": "building", "icon_color": "white", "prefix": "fa"}
+        return {"color": "purple", "icon": "gift", "icon_color": "white", "prefix": "fa"}
 
     # 4. Movie Theater / Culture / Theme Park
     if "영화" in c_lower or "극장" in c_lower or "cgv" in b_lower or "메가박스" in b_lower or "롯데시네마" in b_lower or "롯데월드" in b_lower or "에버랜드" in b_lower:
@@ -527,6 +527,6 @@ def get_category_marker_icon(brand: str, category: str = "") -> dict:
 
     # 9. Leisure & Shopping & Fashion
     if "여가" in c_lower or "쇼핑" in c_lower or "스파오" in b_lower or "유니클로" in b_lower or "탑텐" in b_lower or "무신사" in b_lower or "abc" in b_lower or "쏘카" in b_lower or "주유" in c_lower or "칼텍스" in b_lower or "무인양품" in b_lower or "모던하우스" in b_lower or "아트박스" in b_lower:
-        return {"color": "cadetblue", "icon": "tag", "icon_color": "white", "prefix": "fa"}
+        return {"color": "cadetblue", "icon": "shopping-bag", "icon_color": "white", "prefix": "fa"}
 
     return {"color": "blue", "icon": "info-circle", "icon_color": "white", "prefix": "fa"}
