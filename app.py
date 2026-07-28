@@ -36,31 +36,7 @@ hide_default_ui = """
         display: none !important;
     }
     
-    /* 2. 하단 일반 푸터 완전 삭제 */
-    [data-testid="stFooter"] {
-        display: none !important;
-    }
-    footer {
-        display: none !important;
-    }
-    
-    /* 3. Streamlit Cloud 전용 우측 하단 "Hosted with Streamlit" 뱃지 강제 삭제 */
-    .viewerBadge_container {
-        display: none !important;
-    }
-    .viewerBadge_link {
-        display: none !important;
-    }
-    [data-testid="viewerBadge"] {
-        display: none !important;
-    }
-    
-    /* 4. Streamlit 최신 버전에서 생기는 맨 아래쪽 빈 공간 삭제 */
-    [data-testid="stBottom"] {
-        display: none !important;
-    }
-    
-    /* 5. 헤더가 지워진 후 상단에 붕 뜨는 여백 깔끔하게 올리기 */
+    /* 2. 헤더가 지워진 후 상단에 붕 뜨는 여백 깔끔하게 올리기 */
     div.block-container {
         padding-top: 1rem !important;
     }
