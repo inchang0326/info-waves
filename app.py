@@ -16,6 +16,7 @@ from services.logger_utils import setup_logger
 import copy
 import logging
 import os
+from PIL import Image
 
 # Declare custom Kakao search component (Pure Frontend Autocomplete)
 COMPONENT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui_components", "kakao_search")
@@ -27,7 +28,9 @@ device_location = components.declare_component("device_location", path=LOC_COMPO
 from services.logger_utils import setup_logger
 logger = setup_logger("app")
 
-st.set_page_config(page_title="Info Waves", layout="wide")
+icon_img = Image.open("map_with_pin_icon-512x512.png") 
+
+st.set_page_config(page_title="Info Waves", layout="wide", page_icon=icon_img)
 
 hide_default_ui = """
 <style>
