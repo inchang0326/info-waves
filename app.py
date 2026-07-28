@@ -28,6 +28,21 @@ from services.logger_utils import setup_logger
 logger = setup_logger("app")
 
 st.set_page_config(page_title="Info Waves", layout="wide")
+
+hide_default_ui = """
+<style>
+    /* 우측 상단 Deploy 버튼 숨기기 */
+    .stAppDeployButton {display:none !important;}
+    /* 우측 상단 햄버거 메뉴 숨기기 */
+    #MainMenu {visibility: hidden !important;}
+    /* 하단 Streamlit 워터마크 숨기기 */
+    footer {visibility: hidden !important;}
+    /* 상단 빈 공간(헤더) 완전히 없애기 (선택 사항) */
+    header {visibility: hidden !important;}
+</style>
+"""
+st.markdown(hide_default_ui, unsafe_allow_html=True)
+
 inject_global_clipboard_script()
 
 st.markdown("""
