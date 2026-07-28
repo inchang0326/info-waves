@@ -31,14 +31,22 @@ st.set_page_config(page_title="Info Waves", layout="wide", page_icon="map_with_p
 
 hide_default_ui = """
 <style>
-    /* 우측 상단 Deploy 버튼 숨기기 */
-    .stAppDeployButton {display:none !important;}
-    /* 우측 상단 햄버거 메뉴 숨기기 */
-    #MainMenu {visibility: hidden !important;}
-    /* 하단 Streamlit 워터마크 숨기기 */
-    footer {visibility: hidden !important;}
-    /* 상단 빈 공간(헤더) 완전히 없애기 (선택 사항) */
-    header {visibility: hidden !important;}
+    /* 1. 상단 헤더 (Deploy 버튼, 햄버거 메뉴 모두 포함) 완전 삭제 */
+    [data-testid="stHeader"] {
+        display: none !important;
+    }    
+    /* 2. 하단 워터마크 (Hosted with Streamlit) 완전 삭제 */
+    [data-testid="stFooter"] {
+        display: none !important;
+    }    
+    /* 3. Streamlit 최신 버전에서 생기는 맨 아래쪽 빈 공간 삭제 */
+    [data-testid="stBottom"] {
+        display: none !important;
+    }    
+    /* 4. 헤더가 지워진 후 상단에 붕 뜨는 여백 깔끔하게 올리기 */
+    div.block-container {
+        padding-top: 1rem !important;
+    }
 </style>
 """
 st.markdown(hide_default_ui, unsafe_allow_html=True)
@@ -103,7 +111,6 @@ st.markdown(f"""
     }}
     
     [data-testid="stAppViewContainer"] {{ background-color: var(--bg-main) !important; color: var(--text-main) !important; transition: background-color 0.3s; }}
-    [data-testid="stHeader"] {{ background: transparent !important; }}
     
     /* Softly apply text color to common tags, letting Streamlit widgets override */
     p, span, h1, h2, h3, h4, h5, h6, label {{ 
