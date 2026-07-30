@@ -49,10 +49,15 @@ def test_fetch_local_alerts_mapping():
         {"name": "CU 산본에듀점", "address": "산본동 100", "road_address": "산본로 123", "lat": 37.361, "lon": 126.928}
     ]
     
+    def _search_side_effect(lat, lon, neighborhood, brand, max_distance_km=3.0):
+        if brand in ["맛집", "가볼만한 곳"]:
+            return []
+        return mock_places
+
     with patch("main.LocationService") as mock_loc_cls:
         mock_instance = MagicMock()
         mock_instance.get_neighborhood.return_value = "산본동"
-        mock_instance.search_nearby_brand.return_value = mock_places
+        mock_instance.search_nearby_brand.side_effect = _search_side_effect
         mock_loc_cls.return_value = mock_instance
         
         local_alerts = fetch_local_alerts(37.360657, 126.928194, global_results, radius_km=3.0)

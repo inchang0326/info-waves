@@ -15,7 +15,7 @@ def test_guzimap_scraper_data_fetching():
             "latest_price_krw": 3000,
             "lat": 37.3602,
             "lng": 126.9204,
-            "naver_place_id": "https://naver.me/test"
+            "naver_place_id": "12345678"
         }
     ]
     
@@ -33,7 +33,7 @@ def test_guzimap_scraper_data_fetching():
         assert item["category"] == "거지맵 (가성비 식당 & 초저가 혜택)"
         assert "짜신 산본본점" in item["target"]
         assert "3,000원" in item["title"]
-        assert item["details"] == "https://naver.me/test"
+        assert item["details"] == "https://xn--v69ak0xskm.com"
         assert item["lat"] == 37.3602
         assert item["lon"] == 126.9204
 
@@ -75,9 +75,9 @@ def test_guzimap_ui_styling_and_formatting():
     title = format_expander_title("거지맵 (가성비 식당 & 초저가 혜택)", 5)
     assert "거지맵 (가성비 식당) (5개)" in title
     
-    # 2. Marker Icon & Color (Vibrant lightblue pin with high contrast dark amber icon)
+    # 2. Marker Icon & Color (Black pin with high contrast yellow cutlery icon)
     icon_info = get_category_marker_icon("짜신 산본본점", "거지맵 (가성비 식당 & 초저가 혜택)")
-    assert icon_info["color"] == "lightblue"
+    assert icon_info["color"] == "black"
     assert icon_info["icon"] == "cutlery"
     assert icon_info["prefix"] == "fa"
     

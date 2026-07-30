@@ -101,12 +101,17 @@ def test_uc06_search_completion_lists_nearby_deals():
     [UC-06] 탐색 완료 시, 내 주변 혜택 목록이 리스트업 되어야 함
     """
     global_results = {
-        "편의점 혜택": [{"target": "CU", "title": "쓔퍼세일", "details": "http://cu.com", "category": "편의점 혜택"}]
+        "편의점 혜택": [{"target": "CU", "title": "퍼세일", "details": "http://cu.com", "category": "편의점 혜택"}]
     }
     fake_places = [{"name": "CU 산본역점", "address": "산본동", "road_address": "산본로 1", "lat": 37.361, "lon": 126.928}]
     
+    def _search_side_effect(neighborhood, brand, lat_round=0.0, lon_round=0.0):
+        if brand in ["맛집", "가볼만한 곳"]:
+            return ()
+        return tuple(fake_places)
+
     with patch("services.location_service.LocationService.get_neighborhood", return_value="산본동"), \
-         patch("services.location_service._cached_search_nearby_brand", return_value=fake_places):
+         patch("services.location_service._cached_search_nearby_brand", side_effect=_search_side_effect):
         
         local_results = fetch_local_alerts(37.360657, 126.928194, global_results, radius_km=3.0)
         assert "내 주변 매장 혜택" in local_results
@@ -259,8 +264,13 @@ def test_uc17_click_storm_same_location_consistency():
     }
     fake_places = [{"name": "CU 산본역점", "address": "산본동", "road_address": "산본로 1", "lat": 37.361, "lon": 126.928}]
     
+    def _search_side_effect_17(neighborhood, brand, lat_round=0.0, lon_round=0.0):
+        if brand in ["맛집", "가볼만한 곳"]:
+            return ()
+        return tuple(fake_places)
+
     with patch("services.location_service.LocationService.get_neighborhood", return_value="산본동"), \
-         patch("services.location_service._cached_search_nearby_brand", return_value=fake_places):
+         patch("services.location_service._cached_search_nearby_brand", side_effect=_search_side_effect_17):
         
         # 5회 연속 연타 클릭 시뮬레이션
         for _ in range(5):

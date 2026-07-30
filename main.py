@@ -13,6 +13,7 @@ from services.logger_utils import setup_logger
 
 logger = setup_logger(__name__)
 
+@st.cache_data(ttl=60 * 60, show_spinner=False)
 def fetch_global_alerts() -> dict:
     logger.info("글로벌(위치 무관) 데이터 스크래핑을 시작합니다...")
     scrapers = [
@@ -22,7 +23,7 @@ def fetch_global_alerts() -> dict:
 
 
 @st.cache_data(ttl=60, show_spinner=False)
-def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km: float = 3.0) -> dict:
+def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km: float = 3.0, _cache_ver: int = 2) -> dict:
     lat = round(float(lat), 5)
     lon = round(float(lon), 5)
     radius_km = round(float(radius_km), 2)
@@ -120,19 +121,25 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
             if not brand: continue
             places = brand_to_places.get(brand, [])
             for p in places:
+                event_details = {}
                 if cat == "팝업스토어 & 전시/행사":
                     coord_key = (round(p["lat"], 4), round(p["lon"], 4), p["name"])
                     if coord_key in seen_popup_coords:
                         continue
                     seen_popup_coords.add(coord_key)
                     actual_brand = p["name"]
-                    actual_title = f"[{p['name']}] {p.get('address', '')} - 실시간 팝업스토어 & 브랜드 행사진행 현황 (네이버 지도 실시간 상세보기)"
-                    query_encoded = urllib.parse.quote(f"{p['name']} 팝업스토어")
-                    actual_details = f"https://m.map.naver.com/search2/search.naver?query={query_encoded}"
+                    actual_title = f"[{p['name']}] {p.get('address', '')} - 팝업스토어 & 브랜드 행사진행 현황"
+                    actual_details = item.get("source_url") or item.get("details")
+
+                    event_details = location_service.fetch_popup_event_details(
+                        brand=p["name"],
+                        confirmid=p.get("confirmid"),
+                        address=p.get("address", "")
+                    )
                 else:
                     actual_brand = brand
                     actual_title = item.get("title")
-                    actual_details = item.get("details")
+                    actual_details = item.get("source_url") or item.get("details")
 
                 mapped_item = {
                     "brand": actual_brand,
@@ -144,7 +151,12 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
                     "address": p["address"],
                     "road_address": p.get("road_address", ""),
                     "lat": p.get("lat"),
-                    "lon": p.get("lon")
+                    "lon": p.get("lon"),
+                    "description": event_details.get("description", item.get("description", "")),
+                    "event_status": event_details.get("event_status", "🔥 진행중"),
+                    "schedule": event_details.get("schedule", ""),
+                    "event_content": event_details.get("event_content", ""),
+                    "source_url": event_details.get("source_url") or actual_details
                 }
                 local_categorized_results[cat].append(mapped_item)
                 
@@ -174,13 +186,13 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
                 for p in places[:20]: # 상위 20개만 노출
                     dist_km = round(p.get("distance_km", 0.0), 2)
                     encoded_name = urllib.parse.quote(p["name"])
-                    kakao_url = f"https://map.kakao.com/link/search/{encoded_name}"
+                    naver_url = f"https://search.naver.com/search.naver?query={encoded_name}"
                     
                     mapped_item = {
                         "brand": p["name"],
                         "target": p["name"],
                         "title": f"📍 [{dist_km}km] {p.get('address', '')}",
-                        "details": kakao_url,
+                        "details": naver_url,
                         "category": cat_name,
                         "orig_category": cat_name,
                         "address": p.get("address", ""),

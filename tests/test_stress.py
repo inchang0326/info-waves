@@ -48,8 +48,13 @@ def test_st02_large_scale_local_mapping_thread_pool_stress():
         {"name": "CU 산본역점", "address": "산본동 100", "road_address": "산본로 123", "lat": 37.3610, "lon": 126.9285}
     ]
     
+    def _search_side_effect(neighborhood, brand, lat_round=0.0, lon_round=0.0):
+        if brand in ["맛집", "가볼만한 곳"]:
+            return ()
+        return tuple(fake_places)
+
     with patch("services.location_service.LocationService.get_neighborhood", return_value="산본동"), \
-         patch("services.location_service._cached_search_nearby_brand", return_value=fake_places):
+         patch("services.location_service._cached_search_nearby_brand", side_effect=_search_side_effect):
         
         start_time = time.time()
         local_results = fetch_local_alerts(37.360657, 126.928194, global_results, radius_km=3.0)

@@ -36,7 +36,17 @@ hide_default_ui = """
         display: none !important;
     }
     
-    /* 2. 헤더가 지워진 후 상단에 붕 뜨는 여백 깔끔하게 올리기 */
+    /* 2. 하단 Streamlit 기본 footer (Made with Streamlit) 및 햄버거 메뉴 삭제 */
+    footer {
+        visibility: hidden !important;
+        display: none !important;
+    }
+    #MainMenu {
+        visibility: hidden !important;
+        display: none !important;
+    }
+    
+    /* 3. 헤더가 지워진 후 상단에 붕 뜨는 여백 깔끔하게 올리기 */
     div.block-container {
         padding-top: 1rem !important;
     }
@@ -882,7 +892,7 @@ if curr_view == "내 주변 맞춤 혜택":
                         b_lat = branch.get("lat")
                         b_lon = branch.get("lon")
                         if b_lat and b_lon:
-                            popup_html = generate_mini_popup_html(brand, title, link)
+                            popup_html = generate_mini_popup_html(brand, title, link, branch)
                             popup = folium.Popup(folium.Html(popup_html, script=True), max_width=320)
                             icon_style = get_category_marker_icon(brand, branch.get("orig_category") or category)
                             folium.Marker(
@@ -970,7 +980,7 @@ if curr_view == "내 주변 맞춤 혜택":
                 try:
                     st.cache_data.clear()
                     st.session_state["_last_searched_key"] = searched_key
-                    st.session_state["local_results"] = fetch_local_alerts(c_lat, c_lon, global_results, radius_km_val)
+                    st.session_state["local_results"] = fetch_local_alerts(c_lat, c_lon, global_results, radius_km_val, _cache_ver=2)
                     st.session_state["_local_results_ver"] = st.session_state.get("_local_results_ver", 0) + 1
                 except Exception as e:
                     st.error(f"주변 혜택 매핑 실패: {e}")
@@ -1038,6 +1048,6 @@ else:
                     col = [col1, col2, col3][i % 3]
                     target = item.get("target", "알 수 없음")
                     title = item.get("title", "")
-                    link = item.get("details", "")
+                    link = item.get("source_url") or item.get("details", "")
                     card = generate_card_html(target, title, link)
                     col.markdown(card, unsafe_allow_html=True)

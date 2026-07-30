@@ -306,18 +306,54 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
     - Clicking the card header/title area opens the detail link directly in a new tab.
     - Branch list is collapsible under "주변 매칭" label.
     - Each branch shows road address as inline tooltip on hover with copy button.
+    - R2: Displays detailed popup store event description, status badge, operating hours, and links.
     """
     logo_url = get_brand_logo(brand)
     fallback_badge = get_brand_fallback_badge(brand)
 
     href = link if (link and link.startswith("http")) else f"https://search.naver.com/search.naver?query={html.escape(link or brand)}"
+    if "xn--v69ak0xskm.com" in href:
+        target_item = (branches[0] if (branches and len(branches) > 0) else None)
+        if target_item and target_item.get("lat") and target_item.get("lon"):
+            import urllib.parse
+            href = f"https://map.kakao.com/link/map/{urllib.parse.quote(brand)},{target_item.get('lat')},{target_item.get('lon')}"
+        elif target_item and target_item.get("address"):
+            import urllib.parse
+            search_query = f"{brand} {target_item.get('address')}".strip()
+            href = f"https://map.kakao.com/link/search/{urllib.parse.quote(search_query)}"
 
     escaped_brand = html.escape(str(brand or ""))
     escaped_title = html.escape(str(title or ""))
 
+    # Event details block for popup store items
+    event_details_html = ""
+    target_item = (branches[0] if (branches and len(branches) > 0) else None)
+    if target_item and target_item.get("description"):
+        desc = html.escape(str(target_item.get("description", "")))
+        status = html.escape(str(target_item.get("event_status", "🔥 진행중")))
+        schedule = html.escape(str(target_item.get("schedule", "")))
+        content = html.escape(str(target_item.get("event_content", "")))
+        src_url = target_item.get("source_url") or href
+
+        schedule_block = f'<div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">📅 {schedule}</div>' if schedule else ''
+        content_block = f'<div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">🏷️ {content}</div>' if content else ''
+
+        event_details_html = (
+            f'<div class="event-details-box" style="margin-top: 12px; padding: 12px; background: rgba(254, 243, 199, 0.15); border: 1px solid rgba(217, 119, 6, 0.3); border-radius: 12px;">'
+            f'<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">'
+            f'<span style="background: #FEF3C7; color: #D97706; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px;">{status}</span>'
+            f'<a href="{src_url}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: #059669; font-weight: 700; text-decoration: none;">🔗 행사 소식</a>'
+            f'</div>'
+            f'<div style="font-size: 13px; font-weight: 600; color: var(--text-main); line-height: 1.4;">{desc}</div>'
+            f'{schedule_block}'
+            f'{content_block}'
+            f'</div>'
+        )
+
     # Branch section: collapsible "주변 매칭"
     branches_html = ""
     if branches:
+        import urllib.parse
         branch_items = ""
         for b in branches:
             name = html.escape(str(b.get('target', '')))
@@ -326,11 +362,21 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
             safe_addr = road_addr.replace('"', '&quot;').replace("'", "&#39;").replace('\n', ' ').replace('\r', '')
             
             if road_addr:
+                lat = b.get("lat")
+                lon = b.get("lon")
+                if lat and lon:
+                    kakaomap_link = f"https://map.kakao.com/link/map/{urllib.parse.quote(name)},{lat},{lon}"
+                else:
+                    search_query = f"{name} {road_addr}".strip()
+                    kakaomap_link = f"https://map.kakao.com/link/search/{urllib.parse.quote(search_query)}"
                 branch_items += (
                     f'<div class="branch-item" style="cursor:pointer;">'
                     f'<div class="branch-name" style="display:flex; justify-content:space-between; align-items:center;">'
                     f'<span>{name}</span>'
+                    f'<div>'
                     f'<span class="copy-addr-btn" data-addr="{safe_addr}" style="font-size:12px; color:#3B82F6; font-weight:600; padding:2px 4px;">주소 복사</span>'
+                    f'<a href="{kakaomap_link}" target="_blank" rel="noopener noreferrer" onclick="window.open(this.href, \'_blank\', \'noopener,noreferrer\'); return false;" style="font-size:12px; color:#10B981; font-weight:600; padding:2px 4px; text-decoration:none; margin-left:4px;">바로 가기</a>'
+                    f'</div>'
                     f'</div>'
                     f'</div>'
                 )
@@ -353,6 +399,9 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
     import hashlib
     card_id = "c" + hashlib.md5(f"{brand}{title}".encode()).hexdigest()[:8]
 
+    safe_item = target_item or {}
+    contents = (html.escape(str(safe_item.get("description", ""))) + " " + html.escape(str(safe_item.get("event_content", "")))).strip()
+    contents = contents or escaped_title
     card_html = (
         f'<div id="{card_id}" class="info-card">'
 
@@ -364,13 +413,12 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
         f'<img src="{logo_url}" '
         f'onerror="this.onerror=null;this.src=\'{fallback_badge}\';" '
         f'class="info-card-logo" alt="{escaped_brand}" referrerpolicy="no-referrer" />'
-        f'<span class="info-card-brand">{escaped_brand}</span>'
         f'</div>'
 
         # Card body: title
-        f'<div class="info-card-title">{escaped_title}</div>'
+        f'<div class="info-card-title">{contents}</div>'
 
-        f'</a>'
+        + f'</a>'
 
         # Branch section: outside the link, collapsible
         + (f'<div class="info-card-branches">{branches_html}</div>' if branches_html else '')
@@ -380,16 +428,65 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
     return card_html
 
 
-def generate_mini_popup_html(brand: str, title: str, link: str) -> str:
+def generate_mini_popup_html(brand: str, title: str, link: str, item_dict: dict = None) -> str:
     """
-    Generates a lightweight, inline-styled HTML for Folium Map Popups.
+    Generates a lightweight, inline-styled HTML for Folium Map Popups with R2 Popup event detail support.
     """
+    import urllib.parse
     logo_url = get_brand_logo(brand)
     fallback_url = get_brand_fallback_badge(brand)
     href = link if (link and link.startswith("http")) else f"https://search.naver.com/search.naver?query={html.escape(link or brand)}"
     escaped_brand = html.escape(str(brand or ""))
     escaped_title = html.escape(str(title or ""))
     
+    kakaomap_btn = ""
+    show_detail_btn = True
+    if item_dict:
+        lat = item_dict.get("lat")
+        lon = item_dict.get("lon")
+        address = str(item_dict.get("road_address") or item_dict.get("address") or "")
+        kakaomap_link = ""
+        if lat and lon:
+            kakaomap_link = f"https://map.kakao.com/link/map/{urllib.parse.quote(brand)},{lat},{lon}"
+        elif address:
+            search_query = f"{brand} {address}".strip()
+            kakaomap_link = f"https://map.kakao.com/link/search/{urllib.parse.quote(search_query)}"
+            
+        if kakaomap_link:
+            kakaomap_btn = f'<a href="{kakaomap_link}" target="_blank" rel="noopener noreferrer" onclick="window.open(this.href, \'_blank\', \'noopener,noreferrer\'); return false;" style="font-size: 12px; color: #10B981; text-decoration: none; font-weight: 700;">바로 가기</a>'
+            
+        if item_dict.get("category") in ["주변 추천 맛집", "주변 가볼만한 곳"]:
+            show_detail_btn = False
+            
+        if item_dict.get("category") and "거지맵" in item_dict.get("category", ""):
+            href = kakaomap_link
+            kakaomap_btn = ""
+
+        if item_dict.get("category") and "팝업스토어" in item_dict.get("category", ""):
+            if item_dict.get("source_url"):
+                href = item_dict["source_url"]
+
+    detail_btn = f'<a href="{href}" target="_blank" rel="noopener noreferrer" onclick="window.open(this.href, \'_blank\', \'noopener,noreferrer\'); return false;" style="font-size: 12px; color: #2563EB; text-decoration: none; font-weight: 700;">자세히 보기</a>' if show_detail_btn else ""
+    
+    if item_dict and item_dict.get("description"):
+        desc = html.escape(str(item_dict.get("description", "")))
+
+        return f"""
+        <div style="font-family: 'Pretendard', -apple-system, sans-serif; min-width: 220px; padding: 6px;">
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <img src="{logo_url}" onerror="this.onerror=null;this.src='{fallback_url}';" style="width: 24px; height: 24px; border-radius: 6px; margin-right: 8px; border: 1px solid #e5e7eb; object-fit: contain; background: white;" />
+                <strong style="font-size: 14px; color: #111827;">{escaped_brand}</strong>
+            </div>
+            <div style="font-size: 13px; font-weight: 600; color: #1F2937; margin-bottom: 8px; line-height: 1.4; word-break: keep-all;">
+                {desc}
+            </div>
+            <div style="display: flex; gap: 8px;">
+                {detail_btn}
+                {kakaomap_btn}
+            </div>
+        </div>
+        """
+
     return f"""
     <div style="font-family: 'Pretendard', -apple-system, sans-serif; min-width: 200px; padding: 4px;">
         <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -399,7 +496,10 @@ def generate_mini_popup_html(brand: str, title: str, link: str) -> str:
         <div style="font-size: 13px; color: #4B5563; margin-bottom: 12px; line-height: 1.4; word-break: keep-all;">
             {escaped_title}
         </div>
-        <a href="{href}" target="_blank" rel="noopener noreferrer" onclick="window.open(this.href, '_blank', 'noopener,noreferrer'); return false;" style="font-size: 12px; color: #2563EB; text-decoration: none; font-weight: 700;">자세히 보기</a>
+        <div style="display: flex; gap: 8px;">
+            {detail_btn}
+            {kakaomap_btn}
+        </div>
     </div>
     """
 
