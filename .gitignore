@@ -32,3 +32,8 @@ logs/
 .DS_Store
 .vscode/
 .idea/
+
+# AI Agents & Scratch
+.agents/
+scratch/
+PROJECT.md
