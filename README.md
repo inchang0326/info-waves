@@ -121,23 +121,6 @@ streamlit run app.py
 
 ---
 
-## 🛡️ 보안 아키텍처 및 방범 정책 (Security Standards)
-
-1. **XSS (Cross-Site Scripting) 방어**:
-   - `services/ui_utils.py` 내 HTML 카드 및 Folium 팝업 생성 시 브랜드명, 프로모션 제목 등 사용자 및 외부 수집 데이터를 `html.escape()`로 철저히 인코딩합니다.
-2. **Tabnabbing (부모 창 리다이렉트) 방지**:
-   - 모든 외부 링크 출력 시 `target="_blank"` 속성 및 `rel="noopener noreferrer"` 속성을 강제 적용합니다.
-3. **자격증명 관리 (Credential Security)**:
-   - 외부 API 키 및 Webhook URL은 소스 코드에 하드코딩하지 않고 `.env` 환경 변수와 `config.py` (Pydantic Settings)를 통해 관리합니다. `.gitignore`에 `.env` 및 `logs/`가 등록되어 있습니다.
-4. **SQL Injection 방지**:
-   - 위치 데이터 영속 캐시(`location_cache.sqlite`) 접근 시 파라미터 바인딩(`?`)을 사용하여 데이터베이스 주입 공격을 완벽히 방지합니다.
-5. **HTTPS 전송 암호화**:
-   - IP 기반 위치 조회 시 HTTPS 엔드포인트(`ipapi.co`, `ipinfo.io`)를 1차 활용하여 평문 통신 및 MITM 데이터 위변조 위험을 차단합니다.
-6. **크롤러 프로세스 리소스 해제 보장**:
-   - Playwright 헤드리스 브라우저 활용 시 `try...finally` 구조를 적용하여 네트워크 지연 시에도 Chromium 프로세스가 확실히 종료되도록 관리합니다.
-
----
-
 ## 🧪 테스트 실행 가이드 (Testing Suite)
 
 `pytest`를 통해 단위 테스트, 위치 서비스 통합 테스트, 스크래퍼 정합성 및 보안 검증 테스트를 실행합니다.
@@ -152,6 +135,23 @@ streamlit run app.py
 # 성능 및 패리티 테스트 실행
 ./venv/bin/pytest tests/test_performance_and_parity.py
 ```
+
+---
+
+## 🛡️ 보안 아키텍처 및 방범 정책 (Security Standards)
+
+1. **XSS (Cross-Site Scripting) 방어**:
+   - `services/ui_utils.py` 내 HTML 카드 및 Folium 팝업 생성 시 브랜드명, 프로모션 제목 등 사용자 및 외부 수집 데이터를 `html.escape()`로 철저히 인코딩합니다.
+2. **Tabnabbing (부모 창 리다이렉트) 방지**:
+   - 모든 외부 링크 출력 시 `target="_blank"` 속성 및 `rel="noopener noreferrer"` 속성을 강제 적용합니다.
+3. **자격증명 관리 (Credential Security)**:
+   - 외부 API 키 및 Webhook URL은 소스 코드에 하드코딩하지 않고 `.env` 환경 변수와 `config.py` (Pydantic Settings)를 통해 관리합니다. `.gitignore`에 `.env` 및 `logs/`가 등록되어 있습니다.
+4. **SQL Injection 방지**:
+   - 위치 데이터 영속 캐시(`location_cache.sqlite`) 접근 시 파라미터 바인딩(`?`)을 사용하여 데이터베이스 주입 공격을 완벽히 방지합니다.
+5. **HTTPS 전송 암호화**:
+   - IP 기반 위치 조회 시 HTTPS 엔드포인트(`ipapi.co`, `ipinfo.io`)를 1차 활용하여 평문 통신 및 MITM 데이터 위변조 위험을 차단합니다.
+6. **크롤러 프로세스 리소스 해제 보장**:
+   - Playwright 헤드리스 브라우저 활용 시 `try...finally` 구조를 적용하여 네트워크 지연 시에도 Chromium 프로세스가 확실히 종료되도록 관리합니다.
 
 ---
 
