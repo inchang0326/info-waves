@@ -402,6 +402,18 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
     safe_item = target_item or {}
     contents = (html.escape(str(safe_item.get("description", ""))) + " " + html.escape(str(safe_item.get("event_content", "")))).strip()
     contents = contents or escaped_title
+    category = (branches[0].get("category", "") if branches and len(branches) > 0 else "")
+    hide_logo = category in ["주변 추천 맛집", "주변 가볼만한 곳"]
+
+    if hide_logo:
+        header_content = f'<div style="font-size: 16px; font-weight: 800; color: var(--text-main); padding-bottom: 8px;">{escaped_brand or "이름 없음"}</div>'
+    else:
+        header_content = (
+            f'<img src="{logo_url}" '
+            f'onerror="this.onerror=null;this.src=\'{fallback_badge}\';" '
+            f'class="info-card-logo" alt="{escaped_brand}" referrerpolicy="no-referrer" />'
+        )
+
     card_html = (
         f'<div id="{card_id}" class="info-card">'
 
@@ -410,9 +422,7 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
 
         # Card header: logo + brand name
         f'<div class="info-card-header">'
-        f'<img src="{logo_url}" '
-        f'onerror="this.onerror=null;this.src=\'{fallback_badge}\';" '
-        f'class="info-card-logo" alt="{escaped_brand}" referrerpolicy="no-referrer" />'
+        f'{header_content}'
         f'</div>'
 
         # Card body: title
@@ -470,11 +480,18 @@ def generate_mini_popup_html(brand: str, title: str, link: str, item_dict: dict 
     
     if item_dict and item_dict.get("description"):
         desc = html.escape(str(item_dict.get("description", "")))
+        
+        category = item_dict.get("category", "")
+        hide_logo = category in ["주변 추천 맛집", "주변 가볼만한 곳"]
+        if hide_logo:
+            logo_html = ""
+        else:
+            logo_html = f'<img src="{logo_url}" onerror="this.onerror=null;this.src=\'{fallback_url}\';" style="width: 24px; height: 24px; border-radius: 6px; margin-right: 8px; border: 1px solid #e5e7eb; object-fit: contain; background: white;" />'
 
         return f"""
         <div style="font-family: 'Pretendard', -apple-system, sans-serif; min-width: 220px; padding: 6px;">
             <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <img src="{logo_url}" onerror="this.onerror=null;this.src='{fallback_url}';" style="width: 24px; height: 24px; border-radius: 6px; margin-right: 8px; border: 1px solid #e5e7eb; object-fit: contain; background: white;" />
+                {logo_html}
                 <strong style="font-size: 14px; color: #111827;">{escaped_brand}</strong>
             </div>
             <div style="font-size: 13px; font-weight: 600; color: #1F2937; margin-bottom: 8px; line-height: 1.4; word-break: keep-all;">

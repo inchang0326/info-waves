@@ -1000,7 +1000,7 @@ if curr_view == "내 주변 맞춤 혜택":
             st.slider(
                 "탐색 반경 (km)", 
                 min_value=0.5,
-                max_value=10.0,
+                max_value=3.0,
                 value=st.session_state.get("radius_val", 3.0),
                 step=0.5,
                 format="%.1fkm",
@@ -1047,7 +1047,7 @@ else:
                 for i, item in enumerate(items[:30]):
                     col = [col1, col2, col3][i % 3]
                     target = item.get("target", "알 수 없음")
-                    title = item.get("title", "")
+                    title = item.get("title", "").replace("✨ [실시간 혜택] ", "")
                     link = item.get("source_url") or item.get("details", "")
                     card = generate_card_html(target, title, link)
                     col.markdown(card, unsafe_allow_html=True)
