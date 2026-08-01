@@ -49,7 +49,7 @@ def test_st02_large_scale_local_mapping_thread_pool_stress():
     ]
     
     def _search_side_effect(neighborhood, brand, lat_round=0.0, lon_round=0.0):
-        if brand in ["맛집", "가볼만한 곳"]:
+        if brand in ["맛집", "가볼만한 곳", "페스티벌"]:
             return ()
         return tuple(fake_places)
 

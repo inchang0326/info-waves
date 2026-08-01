@@ -33,10 +33,11 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
     neighborhood = location_service.get_neighborhood(lat, lon)
     
     local_categorized_results = {
-        "주변 가볼만한 곳": [],
-        "주변 추천 맛집": [],
+        "가볼만한 곳": [],
+        "추천 맛집": [],
         "거지맵 (가성비 식당 & 초저가 혜택)": [],
         "팝업스토어 & 전시/행사": [],
+        "대형 이벤트": [],
         "카페 및 베이커리/디저트": [],
         "백화점 및 프리미엄 아울렛": [],
         "영화관 및 문화/테마파크": [],
@@ -168,8 +169,9 @@ def fetch_local_alerts(lat: float, lon: float, _global_results: dict, radius_km:
     # 3. 주변 맛집, 가볼만한 곳 병렬 다이렉트 조회
     # =========================================================================
     keywords_to_search = {
-        "주변 추천 맛집": "맛집",
-        "주변 가볼만한 곳": "가볼만한 곳"
+        "추천 맛집": "맛집",
+        "가볼만한 곳": "가볼만한 곳",
+        "대형 이벤트": "페스티벌"
     }
 
     def _fetch_keyword_places(cat_name, keyword):

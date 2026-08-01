@@ -46,7 +46,7 @@ def test_fetch_local_alerts_attaches_popup_details():
     ]
 
     def _search_side_effect(neighborhood, brand, lat_round=0.0, lon_round=0.0):
-        if brand in ["맛집", "가볼만한 곳"]:
+        if brand in ["맛집", "가볼만한 곳", "페스티벌"]:
             return ()
         return tuple(fake_places)
 

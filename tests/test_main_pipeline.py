@@ -50,7 +50,7 @@ def test_fetch_local_alerts_mapping():
     ]
     
     def _search_side_effect(lat, lon, neighborhood, brand, max_distance_km=3.0):
-        if brand in ["맛집", "가볼만한 곳"]:
+        if brand in ["맛집", "가볼만한 곳", "페스티벌"]:
             return []
         return mock_places
 

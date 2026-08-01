@@ -29,7 +29,7 @@ class GuziMapScraper(AbstractScraper):
         }
         results = []
         try:
-            resp = requests.get(url, headers=headers, timeout=6)
+            resp = requests.get(url, headers=headers, timeout=15)
             if resp.status_code == 200:
                 data = resp.json()
                 for r in data:

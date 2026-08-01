@@ -106,7 +106,7 @@ def test_uc06_search_completion_lists_nearby_deals():
     fake_places = [{"name": "CU 산본역점", "address": "산본동", "road_address": "산본로 1", "lat": 37.361, "lon": 126.928}]
     
     def _search_side_effect(neighborhood, brand, lat_round=0.0, lon_round=0.0):
-        if brand in ["맛집", "가볼만한 곳"]:
+        if brand in ["맛집", "가볼만한 곳", "페스티벌"]:
             return ()
         return tuple(fake_places)
 
@@ -265,7 +265,7 @@ def test_uc17_click_storm_same_location_consistency():
     fake_places = [{"name": "CU 산본역점", "address": "산본동", "road_address": "산본로 1", "lat": 37.361, "lon": 126.928}]
     
     def _search_side_effect_17(neighborhood, brand, lat_round=0.0, lon_round=0.0):
-        if brand in ["맛집", "가볼만한 곳"]:
+        if brand in ["맛집", "가볼만한 곳", "페스티벌"]:
             return ()
         return tuple(fake_places)
 

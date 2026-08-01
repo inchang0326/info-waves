@@ -403,7 +403,7 @@ def generate_card_html(brand: str, title: str, link: str, branches: list = None)
     contents = (html.escape(str(safe_item.get("description", ""))) + " " + html.escape(str(safe_item.get("event_content", "")))).strip()
     contents = contents or escaped_title
     category = (branches[0].get("category", "") if branches and len(branches) > 0 else "")
-    hide_logo = category in ["주변 추천 맛집", "주변 가볼만한 곳"]
+    hide_logo = category in ["추천 맛집", "가볼만한 곳", "대형 이벤트", "거지맵 (가성비 식당 & 초저가 혜택)", "팝업스토어 & 전시/행사"]
 
     if hide_logo:
         header_content = f'<div style="font-size: 16px; font-weight: 800; color: var(--text-main); padding-bottom: 8px;">{escaped_brand or "이름 없음"}</div>'
@@ -482,7 +482,7 @@ def generate_mini_popup_html(brand: str, title: str, link: str, item_dict: dict 
         desc = html.escape(str(item_dict.get("description", "")))
         
         category = item_dict.get("category", "")
-        hide_logo = category in ["주변 추천 맛집", "주변 가볼만한 곳"]
+        hide_logo = category in ["추천 맛집", "가볼만한 곳", "대형 이벤트", "거지맵 (가성비 식당 & 초저가 혜택)", "팝업스토어 & 전시/행사"]
         if hide_logo:
             logo_html = ""
         else:
